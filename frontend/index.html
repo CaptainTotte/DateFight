@@ -224,13 +224,17 @@
       align-items: flex-end;
       margin-bottom: 0;
     }
-    #change-event { position: absolute; right: 0; bottom: 30px; }
-    .btn-ghost-sm {
-      background: none; border: 1px solid var(--border); color: var(--muted);
-      border-radius: 8px; padding: 7px 13px; font-size: 13px; font-weight: 500;
-      font-family: inherit; cursor: pointer; transition: border-color .15s, color .15s;
+    .bottom-nav {
+      display: flex; justify-content: center; margin-top: 24px;
     }
-    .btn-ghost-sm:hover { border-color: var(--text); color: var(--text); }
+    #change-event {
+      background: var(--accent); color: #13141A;
+      border: none; border-radius: 10px;
+      padding: 11px 22px; font-size: 14px; font-weight: 600;
+      font-family: inherit; cursor: pointer;
+      transition: filter .15s;
+    }
+    #change-event:hover { filter: brightness(1.1); }
     .footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 48px; }
     .footer a { color: var(--muted); }
     .link-btn {
@@ -255,9 +259,11 @@
   <div class="wrap">
     <div class="topbar">
       <div class="brand"><img src="/img/image.png" alt="DateFight" /></div>
-      <button class="btn-ghost-sm hidden" id="change-event">← Byt event</button>
     </div>
     <div id="app"></div>
+    <div class="bottom-nav">
+      <button class="hidden" id="change-event">← Byt event</button>
+    </div>
     <div class="footer">© 2024 DateFight · Hitta dagen som funkar för alla</div>
   </div>
 

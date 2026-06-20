@@ -30,7 +30,17 @@
     .wrap { max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
     .topbar { position: relative; display: flex; justify-content: center; align-items: flex-end; margin-bottom: 0; }
     .brand img { height: 150px; width: auto; display: block; }
-    #logout { position: absolute; right: 0; bottom: 30px; }
+    .bottom-nav {
+      display: flex; justify-content: center; margin-top: 24px;
+    }
+    #logout {
+      background: var(--accent); color: #13141A;
+      border: none; border-radius: 10px;
+      padding: 11px 22px; font-size: 14px; font-weight: 600;
+      font-family: inherit; cursor: pointer;
+      transition: filter .15s;
+    }
+    #logout:hover { filter: brightness(1.1); }
 
     .card {
       background: var(--bg-card); border: 1px solid var(--border);
@@ -163,12 +173,12 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div>
-        <div class="brand"><img src="/img/image.png" alt="DateFight" /></div>
-      </div>
-      <button class="btn ghost sm hidden" id="logout">Logga ut</button>
+      <div class="brand"><img src="/img/image.png" alt="DateFight" /></div>
     </div>
     <div id="app"></div>
+    <div class="bottom-nav">
+      <button class="hidden" id="logout">Logga ut</button>
+    </div>
   </div>
   <div class="toast" id="toast"></div>
 
