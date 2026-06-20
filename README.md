@@ -1,4 +1,4 @@
-# Date Fight
+# DateFight
 
 A small date-polling web app — pick the day that works for everyone. Create an
 event with a few candidate dates, share the 8-character code, and let guests vote

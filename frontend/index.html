@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Date Fight</title>
+  <title>DateFight</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -14,8 +14,8 @@
       --bg-elev: #20212a;
       --text: #F0EEE8;
       --muted: #8b8d98;
-      --accent: #E8631A;
-      --accent-soft: rgba(232, 99, 26, 0.12);
+      --accent: #C9A84C;
+      --accent-soft: rgba(201, 168, 76, 0.12);
       --border: #2a2b33;
       --green: #34d17f;
       --green-soft: rgba(52, 209, 127, 0.14);
@@ -39,13 +39,10 @@
       padding: 48px 20px 80px;
     }
 
-    .brand {
-      text-align: center;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      font-size: 20px;
-      color: var(--accent);
-      margin-bottom: 40px;
+    .brand img {
+      height: 150px;
+      width: auto;
+      display: block;
     }
 
     .card {
@@ -125,11 +122,17 @@
     .help a { color: var(--accent); text-decoration: none; font-size: 14px; }
 
     /* Calendar */
-    .cal-months { display: flex; flex-direction: column; gap: 28px; margin-top: 8px; }
-    .cal-month-name {
-      font-size: 15px; font-weight: 700; margin-bottom: 10px;
-      text-transform: capitalize;
+    .cal-nav-row {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;
     }
+    .cal-nav-btn {
+      width: 34px; height: 34px; border: 1px solid var(--border); background: var(--bg-card);
+      color: var(--text); border-radius: 9px; cursor: pointer; font-size: 18px;
+      display: grid; place-items: center; transition: border-color .15s, color .15s;
+    }
+    .cal-nav-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .cal-nav-btn:disabled { opacity: .3; cursor: default; }
+    .cal-nav-title { font-size: 16px; font-weight: 700; }
     .cal-grid {
       display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
     }
@@ -144,38 +147,26 @@
       position: relative; transition: transform .08s;
     }
     .cal-d.empty { }
-    .cal-d.inactive {
-      color: #3c3d47;
-    }
+    .cal-d.inactive { color: #3c3d47; }
     .cal-d.event-date {
       background: rgba(52, 209, 127, 0.13);
-      color: var(--green);
-      font-weight: 700;
+      color: var(--green); font-weight: 700;
       border: 1px solid rgba(52, 209, 127, 0.25);
       cursor: pointer;
     }
-    .cal-d.event-date:hover {
-      background: rgba(52, 209, 127, 0.25);
-      transform: scale(1.08);
-    }
+    .cal-d.event-date:hover { background: rgba(52, 209, 127, 0.25); transform: scale(1.08); }
     .cal-d.event-date.selected {
-      background: var(--green);
-      color: #13141A;
-      border-color: var(--green);
-      box-shadow: 0 0 14px rgba(52, 209, 127, 0.4);
+      background: var(--green); color: #13141A;
+      border-color: var(--green); box-shadow: 0 0 14px rgba(52, 209, 127, 0.4);
     }
     .cal-d.event-date.selected::after {
-      content: '✓';
-      position: absolute; top: 2px; right: 4px;
-      font-size: 9px; font-weight: 800;
+      content: '✓'; position: absolute; top: 2px; right: 4px; font-size: 9px; font-weight: 800;
     }
     .cal-legend {
       display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: var(--muted);
     }
     .cal-legend span { display: flex; align-items: center; gap: 6px; }
-    .cal-legend i {
-      width: 12px; height: 12px; border-radius: 3px; display: inline-block;
-    }
+    .cal-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
     .cal-legend .dot-g { background: var(--green); }
     .cal-legend .dot-m { background: #3c3d47; }
 
@@ -183,7 +174,7 @@
     .bar-row { margin-bottom: 18px; }
     .bar-head {
       display: flex; justify-content: space-between; align-items: baseline;
-      margin-bottom: 6px; font-size: 14px;
+      margin-bottom: 2px; font-size: 14px;
     }
     .bar-head .lbl { font-weight: 600; }
     .bar-head .cnt { color: var(--muted); font-size: 13px; }
@@ -226,6 +217,20 @@
     .mb { margin-bottom: 24px; }
     .hidden { display: none !important; }
     .desc { color: var(--muted); margin-top: 8px; }
+    .topbar {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      margin-bottom: 0;
+    }
+    #change-event { position: absolute; right: 0; bottom: 30px; }
+    .btn-ghost-sm {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 8px; padding: 7px 13px; font-size: 13px; font-weight: 500;
+      font-family: inherit; cursor: pointer; transition: border-color .15s, color .15s;
+    }
+    .btn-ghost-sm:hover { border-color: var(--text); color: var(--text); }
     .footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 48px; }
     .footer a { color: var(--muted); }
     .link-btn {
@@ -248,15 +253,25 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="brand">Date Fight</div>
+    <div class="topbar">
+      <div class="brand"><img src="/img/image.png" alt="DateFight" /></div>
+      <button class="btn-ghost-sm hidden" id="change-event">← Byt event</button>
+    </div>
     <div id="app"></div>
-    <div class="footer">© 2024 Date Fight · Hitta dagen som funkar för alla</div>
+    <div class="footer">© 2024 DateFight · Hitta dagen som funkar för alla</div>
   </div>
 
   <script>
     const API = '/api';
     const app = document.getElementById('app');
+    const changeBtn = document.getElementById('change-event');
     const state = { event: null, dates: [], tallies: {}, votes: [], selected: new Set() };
+    let calYear = 0, calMonth = 0;
+
+    changeBtn.addEventListener('click', () => {
+      location.hash = '';
+      renderLanding();
+    });
 
     const MONTHS = ['Jan','Feb','Mar','Apr','Maj','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
     const DOW = ['Sön','Mån','Tis','Ons','Tor','Fre','Lör'];
@@ -273,11 +288,12 @@
 
     /* ---------------- Landing ---------------- */
     function renderLanding() {
+      changeBtn.classList.add('hidden');
       app.innerHTML = `
         <div class="card landing center">
           <div class="icon-badge">👥</div>
           <h2>Gå med i event</h2>
-          <p class="muted" style="margin:8px 0 24px">Ange din 8-tecken inbjudningskod för att komma igång.</p>
+          <p class="muted" style="margin:8px 0 24px">Ange den 4-siffriga koden för att komma igång.</p>
           <div class="field">
             <input class="code" id="code" maxlength="4" placeholder="––––" autocomplete="off" />
           </div>
@@ -289,7 +305,7 @@
       const codeInput = document.getElementById('code');
       codeInput.focus();
       codeInput.addEventListener('input', () => {
-        codeInput.value = codeInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        codeInput.value = codeInput.value.replace(/[^0-9]/g, '');
       });
       codeInput.addEventListener('keydown', e => { if (e.key === 'Enter') join(); });
       document.getElementById('join').addEventListener('click', join);
@@ -310,75 +326,106 @@
       }
     }
 
+    function hasVoted(code) {
+      try { return !!localStorage.getItem('voted_' + code); } catch { return false; }
+    }
+    function markVoted(code) {
+      try { localStorage.setItem('voted_' + code, '1'); } catch {}
+    }
+
     function loadEvent(data) {
       state.event = data.event;
       state.dates = data.dates;
       state.tallies = data.tallies;
       state.votes = data.votes;
       state.selected = new Set();
-      renderPage(false);
+      const sorted = [...data.dates].sort((a, b) => a.date.localeCompare(b.date));
+      if (sorted.length) {
+        const d = new Date(sorted[0].date + 'T00:00:00');
+        calYear = d.getFullYear(); calMonth = d.getMonth();
+      }
+      renderPage(false, hasVoted(data.event.code));
     }
 
-    /* ---------------- Calendar builder ---------------- */
-    function buildCalendarHTML() {
-      if (!state.dates.length) return '<p class="muted">Inga datum föreslagna.</p>';
+    /* ---------------- Calendar (single-month with navigation) ---------------- */
+    const MONTH_NAMES = ['Januari','Februari','Mars','April','Maj','Juni',
+                         'Juli','Augusti','September','Oktober','November','December'];
+    const DOW_HDR = ['Mån','Tis','Ons','Tor','Fre','Lör','Sön'];
 
-      // Map 'YYYY-MM-DD' → date id for fast lookup
+    function renderCalView() {
+      const container = document.getElementById('cal-view');
+      if (!container || !state.dates.length) return;
+
       const eventMap = {};
       state.dates.forEach(d => { eventMap[d.date] = d.id; });
 
-      // Find month range
-      const sorted = [...state.dates].sort((a, b) => a.date.localeCompare(b.date));
-      const first = new Date(sorted[0].date + 'T00:00:00');
-      const last  = new Date(sorted[sorted.length - 1].date + 'T00:00:00');
-      const DOW_HDR = ['Mån','Tis','Ons','Tor','Fre','Lör','Sön'];
-      const MONTH_NAMES = ['Januari','Februari','Mars','April','Maj','Juni',
-                           'Juli','Augusti','September','Oktober','November','December'];
+      const year = calYear, month = calMonth;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const startOffset = (new Date(year, month, 1).getDay() + 6) % 7;
 
-      let html = '<div class="cal-months">';
-      let cur = new Date(first.getFullYear(), first.getMonth(), 1);
-      const endMonth = new Date(last.getFullYear(), last.getMonth(), 1);
+      // Determine if prev/next months have any event dates
+      const curKey = year * 12 + month;
+      let hasEarlier = false, hasLater = false;
+      state.dates.forEach(d => {
+        const dd = new Date(d.date + 'T00:00:00');
+        const k = dd.getFullYear() * 12 + dd.getMonth();
+        if (k < curKey) hasEarlier = true;
+        if (k > curKey) hasLater = true;
+      });
 
-      while (cur <= endMonth) {
-        const year = cur.getFullYear(), month = cur.getMonth();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const startOffset = (new Date(year, month, 1).getDay() + 6) % 7; // Mon-first
-
-        let cells = DOW_HDR.map(d => `<div class="cal-dow">${d}</div>`).join('');
-        for (let i = 0; i < startOffset; i++) cells += `<div class="cal-d empty"></div>`;
-        for (let day = 1; day <= daysInMonth; day++) {
-          const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-          const eventId = eventMap[ds];
-          if (eventId != null) {
-            const sel = state.selected.has(eventId);
-            cells += `<div class="cal-d event-date${sel?' selected':''}" data-id="${eventId}">${day}</div>`;
-          } else {
-            cells += `<div class="cal-d inactive">${day}</div>`;
-          }
+      let cells = DOW_HDR.map(d => `<div class="cal-dow">${d}</div>`).join('');
+      for (let i = 0; i < startOffset; i++) cells += `<div class="cal-d empty"></div>`;
+      for (let day = 1; day <= daysInMonth; day++) {
+        const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const eventId = eventMap[ds];
+        if (eventId != null) {
+          const sel = state.selected.has(eventId);
+          cells += `<div class="cal-d event-date${sel?' selected':''}" data-id="${eventId}">${day}</div>`;
+        } else {
+          cells += `<div class="cal-d inactive">${day}</div>`;
         }
-        html += `
-          <div>
-            <div class="cal-month-name">${MONTH_NAMES[month]} ${year}</div>
-            <div class="cal-grid">${cells}</div>
-          </div>`;
-        cur = new Date(year, month + 1, 1);
       }
-      html += '</div>';
-      html += `<div class="cal-legend">
-        <span><i class="dot-g"></i> Tillgängligt datum</span>
-        <span><i class="dot-m"></i> Inte ett alternativ</span>
-      </div>`;
-      return html;
+
+      container.innerHTML = `
+        <div class="cal-nav-row">
+          <button class="cal-nav-btn" id="cal-prev" ${hasEarlier ? '' : 'disabled'}>‹</button>
+          <span class="cal-nav-title">${MONTH_NAMES[month]} ${year}</span>
+          <button class="cal-nav-btn" id="cal-next" ${hasLater ? '' : 'disabled'}>›</button>
+        </div>
+        <div class="cal-grid">${cells}</div>
+        <div class="cal-legend">
+          <span><i class="dot-g"></i> Tillgängligt datum</span>
+          <span><i class="dot-m"></i> Inte ett alternativ</span>
+        </div>`;
+
+      document.getElementById('cal-prev').addEventListener('click', () => changeMonth(-1));
+      document.getElementById('cal-next').addEventListener('click', () => changeMonth(1));
+
+      container.querySelectorAll('.event-date').forEach(cell => {
+        cell.addEventListener('click', () => {
+          const id = Number(cell.dataset.id);
+          if (state.selected.has(id)) { state.selected.delete(id); cell.classList.remove('selected'); }
+          else { state.selected.add(id); cell.classList.add('selected'); }
+        });
+      });
+    }
+
+    function changeMonth(delta) {
+      calMonth += delta;
+      if (calMonth > 11) { calMonth = 0; calYear++; }
+      if (calMonth < 0)  { calMonth = 11; calYear--; }
+      renderCalView();
     }
 
     /* ---------------- Vote + Results (combined) ---------------- */
-    function renderPage(justVoted = false) {
-      const calHTML = buildCalendarHTML();
+    function renderPage(justVoted = false, alreadyVoted = false) {
+      changeBtn.classList.remove('hidden');
       const total = state.votes.length;
       const max = Math.max(0, ...Object.values(state.tallies));
 
       const bars = state.dates.map(d => {
         const count = state.tallies[d.id] || 0;
+        if (count === 0) return '';
         const pct = total ? Math.round((count / total) * 100) : 0;
         const leader = count > 0 && count === max;
         const f = fmtDate(d.date);
@@ -410,9 +457,13 @@
           <h1>${esc(state.event.title)}</h1>
           ${state.event.description ? `<p class="desc">${esc(state.event.description)}</p>` : ''}
 
+          ${alreadyVoted || justVoted ? `
+          <div class="voted-confirm" style="margin-top:20px">
+            ✓ Du har redan röstat på det här eventet
+          </div>` : `
           <div class="mt mb">
             <h2 style="margin-bottom:14px">Vilka dagar kan du?</h2>
-            ${calHTML}
+            <div id="cal-view"></div>
           </div>
           <div class="row mb">
             <div class="field" style="margin:0">
@@ -425,7 +476,7 @@
             </div>
           </div>
           <button class="btn" id="submit">Skicka röst ▷</button>
-          <div class="err" id="err"></div>
+          <div class="err" id="err"></div>`}
 
           <hr class="divider" />
 
@@ -438,14 +489,10 @@
           </div>
         </div>`;
 
-      app.querySelectorAll('.event-date').forEach(cell => {
-        cell.addEventListener('click', () => {
-          const id = Number(cell.dataset.id);
-          if (state.selected.has(id)) { state.selected.delete(id); cell.classList.remove('selected'); }
-          else { state.selected.add(id); cell.classList.add('selected'); }
-        });
-      });
-      document.getElementById('submit').addEventListener('click', submitVote);
+      if (!alreadyVoted && !justVoted) {
+        document.getElementById('submit').addEventListener('click', submitVote);
+        renderCalView();
+      }
 
       // Animate bars after DOM paints.
       requestAnimationFrame(() => {
@@ -453,7 +500,7 @@
       });
     }
 
-    function renderVote() { renderPage(false); }
+    function renderVote() { renderPage(false, hasVoted(state.event.code)); }
 
     async function submitVote() {
       const first = document.getElementById('first').value.trim();
@@ -476,7 +523,15 @@
             date_ids: [...state.selected],
           }),
         });
+        if (r.status === 409) {
+          markVoted(state.event.code);
+          const fresh = await (await fetch(`${API}/events/by-code/${state.event.code}`)).json();
+          state.tallies = fresh.tallies; state.votes = fresh.votes; state.dates = fresh.dates;
+          renderPage(false, true);
+          return;
+        }
         if (!r.ok) throw new Error();
+        markVoted(state.event.code);
         const fresh = await (await fetch(`${API}/events/by-code/${state.event.code}`)).json();
         state.tallies = fresh.tallies; state.votes = fresh.votes; state.dates = fresh.dates;
         state.selected = new Set();
@@ -489,8 +544,8 @@
 
     /* ---------------- Router ---------------- */
     async function route() {
-      const code = location.hash.replace('#', '').trim().toUpperCase();
-      if (code && /^[A-Z0-9]{4}$/.test(code)) {
+      const code = location.hash.replace('#', '').trim();
+      if (code && /^[0-9]{4}$/.test(code)) {
         try {
           const r = await fetch(`${API}/events/by-code/${code}`);
           if (r.ok) { loadEvent(await r.json()); return; }

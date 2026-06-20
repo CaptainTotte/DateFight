@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 DB_PATH = os.environ.get("DB_PATH", "/data/samdag.db")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 
-app = FastAPI(title="Date Fight API")
+app = FastAPI(title="DateFight API")
 
 # Permissive CORS so the API can be hit directly during local dev.
 app.add_middleware(
@@ -101,7 +101,7 @@ def now_iso():
 
 
 def gen_code():
-    return "".join(random.choices(string.ascii_uppercase + string.digits, k=4))
+    return "".join(random.choices(string.digits, k=4))
 
 
 # --------------------------------------------------------------------------- #
@@ -116,6 +116,9 @@ class EventIn(BaseModel):
     description: str = ""
     dates: list[str] = []
 
+
+class UpdateEventDatesIn(BaseModel):
+    dates: list[str] = []
 
 class VoteIn(BaseModel):
     event_id: str
@@ -183,6 +186,21 @@ def list_events(_: bool = Depends(require_admin)):
                 }
             )
     return result
+
+
+@app.patch("/events/{event_id}")
+def update_event_dates(event_id: str, body: UpdateEventDatesIn, _: bool = Depends(require_admin)):
+    with get_db() as conn:
+        if not conn.execute("SELECT 1 FROM events WHERE id = ?", (event_id,)).fetchone():
+            raise HTTPException(status_code=404, detail="Event not found")
+        conn.execute("DELETE FROM event_dates WHERE event_id = ?", (event_id,))
+        for d in body.dates:
+            d = d.strip()
+            if d:
+                conn.execute(
+                    "INSERT INTO event_dates (event_id, date) VALUES (?, ?)", (event_id, d)
+                )
+    return {"updated": True}
 
 
 @app.delete("/events/{event_id}")
@@ -253,6 +271,13 @@ def create_vote(body: VoteIn):
         ).fetchone()
         if not e:
             raise HTTPException(status_code=404, detail="Event not found")
+
+        duplicate = conn.execute(
+            "SELECT 1 FROM votes WHERE event_id = ? AND first_name = ? AND last_name = ?",
+            (body.event_id, body.first_name.strip(), body.last_name.strip()),
+        ).fetchone()
+        if duplicate:
+            raise HTTPException(status_code=409, detail="Already voted")
 
         valid_ids = {
             row["id"]
