@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Date Fight</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #13141A;
+      --bg-card: #1a1b22;
+      --bg-elev: #20212a;
+      --text: #F0EEE8;
+      --muted: #8b8d98;
+      --accent: #E8631A;
+      --accent-soft: rgba(232, 99, 26, 0.12);
+      --border: #2a2b33;
+      --green: #34d17f;
+      --green-soft: rgba(52, 209, 127, 0.14);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
+    }
+
+    .brand {
+      text-align: center;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-size: 20px;
+      color: var(--accent);
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+    }
+
+    h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+    h2 { font-size: 18px; font-weight: 700; }
+    .muted { color: var(--muted); }
+    .center { text-align: center; }
+
+    /* Landing / code input */
+    .landing { max-width: 420px; margin: 40px auto 0; }
+    .icon-badge {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--accent-soft); color: var(--accent);
+      display: grid; place-items: center; margin: 0 auto 18px;
+      font-size: 26px;
+    }
+    label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: var(--muted); margin-bottom: 8px;
+    }
+    input.text, input.code {
+      width: 100%;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 14px 16px;
+      font-size: 15px;
+      font-family: inherit;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    input.text:focus, input.code:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    input.code {
+      text-align: center;
+      font-family: 'SFMono-Regular', ui-monospace, Menlo, monospace;
+      font-size: 36px;
+      letter-spacing: 0.6em;
+      text-indent: 0.6em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 8px;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 10px;
+      padding: 13px 20px; font-size: 15px; font-weight: 600;
+      font-family: inherit; cursor: pointer;
+      transition: filter .15s, transform .05s;
+      width: 100%;
+    }
+    .btn:hover { filter: brightness(1.08); }
+    .btn:active { transform: translateY(1px); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .field { margin-bottom: 18px; }
+    .row { display: flex; gap: 12px; }
+    .row > * { flex: 1; }
+
+    .err {
+      color: #ff6b6b; font-size: 14px; text-align: center;
+      margin-top: 14px; min-height: 18px;
+    }
+
+    .help { text-align: center; margin-top: 22px; }
+    .help a { color: var(--accent); text-decoration: none; font-size: 14px; }
+
+    /* Calendar */
+    .cal-months { display: flex; flex-direction: column; gap: 28px; margin-top: 8px; }
+    .cal-month-name {
+      font-size: 15px; font-weight: 700; margin-bottom: 10px;
+      text-transform: capitalize;
+    }
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
+    }
+    .cal-dow {
+      text-align: center; font-size: 11px; font-weight: 600;
+      color: var(--muted); text-transform: uppercase;
+      letter-spacing: .04em; padding-bottom: 6px;
+    }
+    .cal-d {
+      aspect-ratio: 1 / 1; display: grid; place-items: center;
+      border-radius: 8px; font-size: 14px; font-weight: 500;
+      position: relative; transition: transform .08s;
+    }
+    .cal-d.empty { }
+    .cal-d.inactive {
+      color: #3c3d47;
+    }
+    .cal-d.event-date {
+      background: rgba(52, 209, 127, 0.13);
+      color: var(--green);
+      font-weight: 700;
+      border: 1px solid rgba(52, 209, 127, 0.25);
+      cursor: pointer;
+    }
+    .cal-d.event-date:hover {
+      background: rgba(52, 209, 127, 0.25);
+      transform: scale(1.08);
+    }
+    .cal-d.event-date.selected {
+      background: var(--green);
+      color: #13141A;
+      border-color: var(--green);
+      box-shadow: 0 0 14px rgba(52, 209, 127, 0.4);
+    }
+    .cal-d.event-date.selected::after {
+      content: '✓';
+      position: absolute; top: 2px; right: 4px;
+      font-size: 9px; font-weight: 800;
+    }
+    .cal-legend {
+      display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: var(--muted);
+    }
+    .cal-legend span { display: flex; align-items: center; gap: 6px; }
+    .cal-legend i {
+      width: 12px; height: 12px; border-radius: 3px; display: inline-block;
+    }
+    .cal-legend .dot-g { background: var(--green); }
+    .cal-legend .dot-m { background: #3c3d47; }
+
+    /* Results bars */
+    .bar-row { margin-bottom: 18px; }
+    .bar-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 6px; font-size: 14px;
+    }
+    .bar-head .lbl { font-weight: 600; }
+    .bar-head .cnt { color: var(--muted); font-size: 13px; }
+    .bar-track {
+      height: 32px; background: var(--bg-elev);
+      border-radius: 8px; overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%; width: 0;
+      background: var(--accent);
+      border-radius: 8px;
+      transition: width .9s cubic-bezier(.22,.61,.36,1);
+      display: flex; align-items: center; padding-left: 12px;
+      font-size: 13px; font-weight: 700; color: #fff;
+      white-space: nowrap;
+    }
+    .bar-row.leader .bar-fill { background: var(--green); }
+    .bar-row.leader .lbl::after {
+      content: 'Leder'; margin-left: 8px; font-size: 11px;
+      color: var(--green); background: var(--green-soft);
+      padding: 2px 8px; border-radius: 20px; font-weight: 600;
+    }
+
+    .voters { margin-top: 28px; }
+    .voter {
+      padding: 14px 0; border-top: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .voter .vname { font-weight: 600; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      font-size: 12px; padding: 4px 10px; border-radius: 20px;
+      background: var(--bg-elev); border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .chip.picked { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
+
+    .stack > * + * { margin-top: 12px; }
+    .mt { margin-top: 24px; }
+    .mb { margin-bottom: 24px; }
+    .hidden { display: none !important; }
+    .desc { color: var(--muted); margin-top: 8px; }
+    .footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 48px; }
+    .footer a { color: var(--muted); }
+    .link-btn {
+      background: none; border: none; color: var(--accent);
+      cursor: pointer; font-family: inherit; font-size: 14px; padding: 0;
+    }
+    .divider {
+      border: none; border-top: 1px solid var(--border); margin: 32px 0;
+    }
+    .results-title {
+      font-size: 17px; font-weight: 700; margin-bottom: 20px;
+    }
+    .voted-confirm {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(52,209,127,0.08); border: 1px solid rgba(52,209,127,0.25);
+      border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;
+      font-size: 14px; color: var(--green);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">Date Fight</div>
+    <div id="app"></div>
+    <div class="footer">© 2024 Date Fight · Hitta dagen som funkar för alla</div>
+  </div>
+
+  <script>
+    const API = '/api';
+    const app = document.getElementById('app');
+    const state = { event: null, dates: [], tallies: {}, votes: [], selected: new Set() };
+
+    const MONTHS = ['Jan','Feb','Mar','Apr','Maj','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+    const DOW = ['Sön','Mån','Tis','Ons','Tor','Fre','Lör'];
+
+    function fmtDate(iso) {
+      const d = new Date(iso + 'T00:00:00');
+      if (isNaN(d)) return { dow: '', day: iso, mon: '' };
+      return { dow: DOW[d.getDay()], day: d.getDate(), mon: MONTHS[d.getMonth()] };
+    }
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c =>
+        ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    }
+
+    /* ---------------- Landing ---------------- */
+    function renderLanding() {
+      app.innerHTML = `
+        <div class="card landing center">
+          <div class="icon-badge">👥</div>
+          <h2>Gå med i event</h2>
+          <p class="muted" style="margin:8px 0 24px">Ange din 8-tecken inbjudningskod för att komma igång.</p>
+          <div class="field">
+            <input class="code" id="code" maxlength="4" placeholder="––––" autocomplete="off" />
+          </div>
+          <button class="btn" id="join">Gå med →</button>
+          <div class="err" id="err"></div>
+        </div>
+        <div class="help"><a href="#">Behöver du hjälp?</a></div>`;
+
+      const codeInput = document.getElementById('code');
+      codeInput.focus();
+      codeInput.addEventListener('input', () => {
+        codeInput.value = codeInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      });
+      codeInput.addEventListener('keydown', e => { if (e.key === 'Enter') join(); });
+      document.getElementById('join').addEventListener('click', join);
+
+      async function join() {
+        const code = codeInput.value.trim();
+        const err = document.getElementById('err');
+        err.textContent = '';
+        if (code.length < 4) { err.textContent = 'Koden är 4 tecken.'; return; }
+        try {
+          const r = await fetch(`${API}/events/by-code/${code}`);
+          if (!r.ok) { err.textContent = 'Hittade inget event med den koden.'; return; }
+          loadEvent(await r.json());
+          location.hash = '#' + code;
+        } catch {
+          err.textContent = 'Något gick fel. Försök igen.';
+        }
+      }
+    }
+
+    function loadEvent(data) {
+      state.event = data.event;
+      state.dates = data.dates;
+      state.tallies = data.tallies;
+      state.votes = data.votes;
+      state.selected = new Set();
+      renderPage(false);
+    }
+
+    /* ---------------- Calendar builder ---------------- */
+    function buildCalendarHTML() {
+      if (!state.dates.length) return '<p class="muted">Inga datum föreslagna.</p>';
+
+      // Map 'YYYY-MM-DD' → date id for fast lookup
+      const eventMap = {};
+      state.dates.forEach(d => { eventMap[d.date] = d.id; });
+
+      // Find month range
+      const sorted = [...state.dates].sort((a, b) => a.date.localeCompare(b.date));
+      const first = new Date(sorted[0].date + 'T00:00:00');
+      const last  = new Date(sorted[sorted.length - 1].date + 'T00:00:00');
+      const DOW_HDR = ['Mån','Tis','Ons','Tor','Fre','Lör','Sön'];
+      const MONTH_NAMES = ['Januari','Februari','Mars','April','Maj','Juni',
+                           'Juli','Augusti','September','Oktober','November','December'];
+
+      let html = '<div class="cal-months">';
+      let cur = new Date(first.getFullYear(), first.getMonth(), 1);
+      const endMonth = new Date(last.getFullYear(), last.getMonth(), 1);
+
+      while (cur <= endMonth) {
+        const year = cur.getFullYear(), month = cur.getMonth();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startOffset = (new Date(year, month, 1).getDay() + 6) % 7; // Mon-first
+
+        let cells = DOW_HDR.map(d => `<div class="cal-dow">${d}</div>`).join('');
+        for (let i = 0; i < startOffset; i++) cells += `<div class="cal-d empty"></div>`;
+        for (let day = 1; day <= daysInMonth; day++) {
+          const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+          const eventId = eventMap[ds];
+          if (eventId != null) {
+            const sel = state.selected.has(eventId);
+            cells += `<div class="cal-d event-date${sel?' selected':''}" data-id="${eventId}">${day}</div>`;
+          } else {
+            cells += `<div class="cal-d inactive">${day}</div>`;
+          }
+        }
+        html += `
+          <div>
+            <div class="cal-month-name">${MONTH_NAMES[month]} ${year}</div>
+            <div class="cal-grid">${cells}</div>
+          </div>`;
+        cur = new Date(year, month + 1, 1);
+      }
+      html += '</div>';
+      html += `<div class="cal-legend">
+        <span><i class="dot-g"></i> Tillgängligt datum</span>
+        <span><i class="dot-m"></i> Inte ett alternativ</span>
+      </div>`;
+      return html;
+    }
+
+    /* ---------------- Vote + Results (combined) ---------------- */
+    function renderPage(justVoted = false) {
+      const calHTML = buildCalendarHTML();
+      const total = state.votes.length;
+      const max = Math.max(0, ...Object.values(state.tallies));
+
+      const bars = state.dates.map(d => {
+        const count = state.tallies[d.id] || 0;
+        const pct = total ? Math.round((count / total) * 100) : 0;
+        const leader = count > 0 && count === max;
+        const f = fmtDate(d.date);
+        return `
+          <div class="bar-row ${leader ? 'leader' : ''}">
+            <div class="bar-head">
+              <span class="lbl">${f.dow} ${f.day} ${esc(f.mon)}</span>
+              <span class="cnt">${count} röster · ${pct}%</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" data-pct="${pct}">${pct > 8 ? pct + '%' : ''}</div></div>
+          </div>`;
+      }).join('');
+
+      const voters = state.votes.map(v => {
+        const picked = new Set(v.date_ids);
+        const chips = state.dates.map(d => {
+          const f = fmtDate(d.date);
+          return `<span class="chip ${picked.has(d.id) ? 'picked' : ''}">${f.day} ${esc(f.mon)}</span>`;
+        }).join('');
+        return `
+          <div class="voter">
+            <span class="vname">${esc(v.first_name)} ${esc(v.last_name)}</span>
+            <div class="chips">${chips}</div>
+          </div>`;
+      }).join('');
+
+      app.innerHTML = `
+        <div class="card">
+          <h1>${esc(state.event.title)}</h1>
+          ${state.event.description ? `<p class="desc">${esc(state.event.description)}</p>` : ''}
+
+          <div class="mt mb">
+            <h2 style="margin-bottom:14px">Vilka dagar kan du?</h2>
+            ${calHTML}
+          </div>
+          <div class="row mb">
+            <div class="field" style="margin:0">
+              <label>Förnamn</label>
+              <input class="text" id="first" placeholder="Anna" autocomplete="given-name" />
+            </div>
+            <div class="field" style="margin:0">
+              <label>Efternamn</label>
+              <input class="text" id="last" placeholder="Andersson" autocomplete="family-name" />
+            </div>
+          </div>
+          <button class="btn" id="submit">Skicka röst ▷</button>
+          <div class="err" id="err"></div>
+
+          <hr class="divider" />
+
+          <div class="results-title">Resultat · ${total} ${total === 1 ? 'röst' : 'röster'}</div>
+          ${justVoted ? '<div class="voted-confirm">✓ Din röst är registrerad!</div>' : ''}
+          <div id="bars">${bars || '<p class="muted">Inga röster än.</p>'}</div>
+          <div class="voters">
+            <h2 class="mb" style="margin-top:24px">Vem kan när?</h2>
+            ${voters || '<p class="muted">Ingen har röstat än.</p>'}
+          </div>
+        </div>`;
+
+      app.querySelectorAll('.event-date').forEach(cell => {
+        cell.addEventListener('click', () => {
+          const id = Number(cell.dataset.id);
+          if (state.selected.has(id)) { state.selected.delete(id); cell.classList.remove('selected'); }
+          else { state.selected.add(id); cell.classList.add('selected'); }
+        });
+      });
+      document.getElementById('submit').addEventListener('click', submitVote);
+
+      // Animate bars after DOM paints.
+      requestAnimationFrame(() => {
+        app.querySelectorAll('.bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
+      });
+    }
+
+    function renderVote() { renderPage(false); }
+
+    async function submitVote() {
+      const first = document.getElementById('first').value.trim();
+      const last = document.getElementById('last').value.trim();
+      const err = document.getElementById('err');
+      err.textContent = '';
+      if (!first || !last) { err.textContent = 'Fyll i för- och efternamn.'; return; }
+      if (state.selected.size === 0) { err.textContent = 'Välj minst en dag.'; return; }
+
+      const btn = document.getElementById('submit');
+      btn.disabled = true; btn.textContent = 'Skickar…';
+      try {
+        const r = await fetch(`${API}/votes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event_id: state.event.id,
+            first_name: first,
+            last_name: last,
+            date_ids: [...state.selected],
+          }),
+        });
+        if (!r.ok) throw new Error();
+        const fresh = await (await fetch(`${API}/events/by-code/${state.event.code}`)).json();
+        state.tallies = fresh.tallies; state.votes = fresh.votes; state.dates = fresh.dates;
+        state.selected = new Set();
+        renderPage(true);
+      } catch {
+        err.textContent = 'Kunde inte skicka rösten.';
+        btn.disabled = false; btn.textContent = 'Skicka röst ▷';
+      }
+    }
+
+    /* ---------------- Router ---------------- */
+    async function route() {
+      const code = location.hash.replace('#', '').trim().toUpperCase();
+      if (code && /^[A-Z0-9]{4}$/.test(code)) {
+        try {
+          const r = await fetch(`${API}/events/by-code/${code}`);
+          if (r.ok) { loadEvent(await r.json()); return; }
+        } catch {}
+      }
+      renderLanding();
+    }
+
+    window.addEventListener('hashchange', route);
+    route();
+  </script>
+</body>
+</html>
