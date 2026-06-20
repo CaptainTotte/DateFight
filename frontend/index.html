@@ -198,6 +198,14 @@
       padding: 2px 8px; border-radius: 20px; font-weight: 600;
     }
 
+    .bars-toggle {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 500;
+      font-family: inherit; cursor: pointer; margin-top: 8px; width: 100%;
+      transition: border-color .15s, color .15s;
+    }
+    .bars-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
     .voters { margin-top: 28px; }
     .voter {
       padding: 14px 0; border-top: 1px solid var(--border);
@@ -430,8 +438,9 @@
       const uniqueCounts = new Set(Object.values(state.tallies).filter(c => c > 0));
       const hasRealLeader = uniqueCounts.size > 1;
 
+      const BARS_LIMIT = 5;
       const sortedDates = [...state.dates].sort((a, b) => (state.tallies[b.id] || 0) - (state.tallies[a.id] || 0));
-      const bars = sortedDates.map(d => {
+      const barItems = sortedDates.map(d => {
         const count = state.tallies[d.id] || 0;
         if (count === 0) return '';
         const pct = total ? Math.round((count / total) * 100) : 0;
@@ -445,7 +454,12 @@
             </div>
             <div class="bar-track"><div class="bar-fill" data-pct="${pct}">${pct > 12 ? pct + '%' : ''}</div></div>
           </div>`;
-      }).join('');
+      }).filter(Boolean);
+      const hiddenCount = Math.max(0, barItems.length - BARS_LIMIT);
+      const bars = barItems.length === 0 ? '' :
+        barItems.slice(0, BARS_LIMIT).join('') +
+        (hiddenCount > 0 ? `<div class="bars-overflow hidden" id="bars-overflow">${barItems.slice(BARS_LIMIT).join('')}</div>
+          <button class="bars-toggle" id="bars-toggle">Visa ${hiddenCount} datum till ▾</button>` : '');
 
       const voters = state.votes.map(v => {
         const picked = new Set(v.date_ids);
@@ -506,9 +520,23 @@
         renderCalView();
       }
 
+      const barsToggle = document.getElementById('bars-toggle');
+      if (barsToggle) {
+        barsToggle.addEventListener('click', () => {
+          const overflow = document.getElementById('bars-overflow');
+          const open = overflow.classList.toggle('hidden') === false;
+          barsToggle.textContent = open
+            ? `Dölj ▴`
+            : `Visa ${hiddenCount} datum till ▾`;
+          if (open) requestAnimationFrame(() => {
+            overflow.querySelectorAll('.bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
+          });
+        });
+      }
+
       // Animate bars after DOM paints.
       requestAnimationFrame(() => {
-        app.querySelectorAll('.bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
+        app.querySelectorAll('.bar-fill:not(#bars-overflow .bar-fill)').forEach(b => { b.style.width = b.dataset.pct + '%'; });
       });
     }
 
