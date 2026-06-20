@@ -171,7 +171,7 @@
     .cal-legend .dot-m { background: #3c3d47; }
 
     /* Results bars */
-    .bar-row { margin-bottom: 18px; }
+    .bar-row { margin-bottom: 10px; }
     .bar-head {
       display: flex; justify-content: space-between; align-items: baseline;
       margin-bottom: 2px; font-size: 14px;
@@ -179,7 +179,7 @@
     .bar-head .lbl { font-weight: 600; }
     .bar-head .cnt { color: var(--muted); font-size: 13px; }
     .bar-track {
-      height: 32px; background: var(--bg-elev);
+      height: 22px; background: var(--bg-elev);
       border-radius: 8px; overflow: hidden;
     }
     .bar-fill {
@@ -205,12 +205,10 @@
     }
     .voter .vname { font-weight: 600; }
     .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .chip {
+    .chip.picked {
       font-size: 12px; padding: 4px 10px; border-radius: 20px;
-      background: var(--bg-elev); border: 1px solid var(--border);
-      color: var(--muted);
+      background: var(--accent-soft); border: 1px solid var(--accent); color: var(--text);
     }
-    .chip.picked { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
 
     .stack > * + * { margin-top: 12px; }
     .mt { margin-top: 24px; }
@@ -429,11 +427,15 @@
       const total = state.votes.length;
       const max = Math.max(0, ...Object.values(state.tallies));
 
-      const bars = state.dates.map(d => {
+      const uniqueCounts = new Set(Object.values(state.tallies).filter(c => c > 0));
+      const hasRealLeader = uniqueCounts.size > 1;
+
+      const sortedDates = [...state.dates].sort((a, b) => (state.tallies[b.id] || 0) - (state.tallies[a.id] || 0));
+      const bars = sortedDates.map(d => {
         const count = state.tallies[d.id] || 0;
         if (count === 0) return '';
         const pct = total ? Math.round((count / total) * 100) : 0;
-        const leader = count > 0 && count === max;
+        const leader = hasRealLeader && count === max;
         const f = fmtDate(d.date);
         return `
           <div class="bar-row ${leader ? 'leader' : ''}">
@@ -441,20 +443,24 @@
               <span class="lbl">${f.dow} ${f.day} ${esc(f.mon)}</span>
               <span class="cnt">${count} röster · ${pct}%</span>
             </div>
-            <div class="bar-track"><div class="bar-fill" data-pct="${pct}">${pct > 8 ? pct + '%' : ''}</div></div>
+            <div class="bar-track"><div class="bar-fill" data-pct="${pct}">${pct > 12 ? pct + '%' : ''}</div></div>
           </div>`;
       }).join('');
 
       const voters = state.votes.map(v => {
         const picked = new Set(v.date_ids);
-        const chips = state.dates.map(d => {
+        const pickedDates = state.dates.filter(d => picked.has(d.id));
+        const chips = pickedDates.map(d => {
           const f = fmtDate(d.date);
-          return `<span class="chip ${picked.has(d.id) ? 'picked' : ''}">${f.day} ${esc(f.mon)}</span>`;
+          return `<span class="chip picked">${f.dow} ${f.day} ${esc(f.mon)}</span>`;
         }).join('');
+        const label = pickedDates.length === 0
+          ? '<span class="muted" style="font-size:13px">Valde inga datum</span>'
+          : chips;
         return `
           <div class="voter">
             <span class="vname">${esc(v.first_name)} ${esc(v.last_name)}</span>
-            <div class="chips">${chips}</div>
+            <div class="chips">${label}</div>
           </div>`;
       }).join('');
 
