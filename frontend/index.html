@@ -230,9 +230,7 @@
 
     /* Results list */
     .top-dates { margin-bottom: 28px; }
-    .td-rank { color: var(--muted); width: 18px; font-weight: 600; flex-shrink: 0; }
     .td-name { font-weight: 600; flex: 1; }
-    .td-score { color: var(--muted); font-size: 13px; }
     .td-bar-track { height: 10px; background: var(--bg-elev); border-radius: 5px; overflow: hidden; margin-bottom: 2px; }
     .td-bar-fill {
       height: 100%; width: 0; border-radius: 3px;
@@ -240,21 +238,30 @@
       transition: width .9s cubic-bezier(.22,.61,.36,1);
     }
 
+    /* Score groups */
+    .date-group { margin-bottom: 4px; }
+    .date-group-header {
+      display: flex; align-items: baseline; gap: 8px;
+      padding: 12px 0 6px; border-top: 1px solid var(--border);
+    }
+    .date-group:first-child .date-group-header { border-top: none; }
+    .td-rank { font-size: 15px; font-weight: 700; color: var(--text); }
+    .dg-score { font-size: 13px; color: var(--muted); }
+    .date-group.leader .td-rank { color: var(--green); }
+    .date-group.leader .td-bar-fill { background: var(--green); }
+
     /* Accordion date items */
-    .date-item { border-top: 1px solid var(--border); cursor: pointer; user-select: none; }
-    .date-item:first-child { border-top: none; }
+    .date-item { cursor: pointer; user-select: none; border-top: 1px solid var(--border); }
+    .date-group .date-item:first-of-type { border-top: none; }
     .date-item-header {
       display: flex; align-items: center; gap: 10px;
-      padding: 10px 0; font-size: 14px;
+      padding: 10px 0 4px; font-size: 14px;
     }
     .date-item-header:hover .td-name { color: var(--accent); }
-    .date-item.leader .td-name,
-    .date-item.leader .td-score { color: var(--green); }
-    .date-item.leader .td-bar-fill { background: var(--green); }
     .td-chevron { margin-left: auto; color: var(--muted); font-size: 11px; transition: transform .2s; }
     .date-item.open .td-chevron { transform: rotate(180deg); }
     .date-item-voters {
-      display: none; padding: 0 0 12px 28px;
+      display: none; padding: 2px 0 10px 0;
       font-size: 13px; color: var(--muted); line-height: 1.8;
     }
     .date-item.open .date-item-voters { display: block; }
@@ -1457,39 +1464,60 @@
         .filter(d => (state.tallies[d.id] || 0) > 0)
         .sort((a, b) => (state.tallies[b.id] || 0) - (state.tallies[a.id] || 0));
 
-      const LIMIT = 5;
-      const visibleDates = sortedDates.slice(0, LIMIT);
-      const hiddenDates  = sortedDates.slice(LIMIT);
-
-      const renderDateItem = (d) => {
+      // Build score groups
+      const groups = [];
+      for (const d of sortedDates) {
         const count = state.tallies[d.id] || 0;
-        const pct   = total ? Math.round((count / total) * 100) : 0;
-        const f     = fmtDate(d.date);
-        const isLeader = hasRealLeader && count === max;
-        const rank = sortedDates.filter(x => (state.tallies[x.id] || 0) > count).length + 1;
-        const rankLabel = hasRealLeader ? `${rank}.` : '';
-        const voters = state.votes
-          .filter(v => v.date_ids.includes(d.id))
-          .map(v => `${esc(v.first_name)} ${esc(v.last_name)}`)
-          .join(', ');
+        if (!groups.length || groups[groups.length - 1].count !== count) {
+          const rank = sortedDates.filter(x => (state.tallies[x.id] || 0) > count).length + 1;
+          const pct  = total ? Math.round((count / total) * 100) : 0;
+          groups.push({ rank, count, pct, dates: [] });
+        }
+        groups[groups.length - 1].dates.push(d);
+      }
+
+      // Split groups at LIMIT dates (never cut a group in half)
+      const LIMIT = 5;
+      let seen = 0, splitAt = groups.length;
+      for (let i = 0; i < groups.length; i++) {
+        if (seen + groups[i].dates.length > LIMIT && i > 0) { splitAt = i; break; }
+        seen += groups[i].dates.length;
+      }
+      const visibleGroups = groups.slice(0, splitAt);
+      const hiddenGroups  = groups.slice(splitAt);
+      const hiddenCount   = hiddenGroups.reduce((n, g) => n + g.dates.length, 0);
+
+      const renderGroup = (g, isLeader) => {
+        const datesHTML = g.dates.map(d => {
+          const f = fmtDate(d.date);
+          const voters = state.votes
+            .filter(v => v.date_ids.includes(d.id))
+            .map(v => `${esc(v.first_name)} ${esc(v.last_name)}`).join(', ');
+          return `
+            <div class="date-item">
+              <div class="date-item-header">
+                <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
+                <span class="td-chevron">▾</span>
+              </div>
+              <div class="td-bar-track"><div class="td-bar-fill" data-pct="${g.pct}"></div></div>
+              <div class="date-item-voters">${voters || '—'}</div>
+            </div>`;
+        }).join('');
         return `
-          <div class="date-item${isLeader ? ' leader' : ''}">
-            <div class="date-item-header">
-              <span class="td-rank">${rankLabel}</span>
-              <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
-              <span class="td-score">${count}/${total} · ${pct}%</span>
-              <span class="td-chevron">▾</span>
+          <div class="date-group${isLeader ? ' leader' : ''}">
+            <div class="date-group-header">
+              <span class="td-rank">${g.rank}.</span>
+              <span class="dg-score">${g.count}/${total} · ${g.pct}%</span>
             </div>
-            <div class="td-bar-track"><div class="td-bar-fill" data-pct="${pct}"></div></div>
-            <div class="date-item-voters">${voters || '—'}</div>
+            ${datesHTML}
           </div>`;
       };
 
-      const visibleHTML = visibleDates.map(d => renderDateItem(d)).join('');
-      const hiddenHTML  = hiddenDates.map(d => renderDateItem(d)).join('');
-      const overflowBlock = hiddenDates.length > 0
+      const visibleHTML = visibleGroups.map((g, i) => renderGroup(g, hasRealLeader && i === 0)).join('');
+      const hiddenHTML  = hiddenGroups.map(g => renderGroup(g, false)).join('');
+      const overflowBlock = hiddenCount > 0
         ? `<div class="dates-overflow hidden" id="dates-overflow">${hiddenHTML}</div>
-           <button class="bars-toggle" id="dates-toggle">${t('showMore', hiddenDates.length)}</button>`
+           <button class="bars-toggle" id="dates-toggle">${t('showMore', hiddenCount)}</button>`
         : '';
 
       const listHTML = sortedDates.length === 0
