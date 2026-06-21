@@ -1461,11 +1461,13 @@
       const visibleDates = sortedDates.slice(0, LIMIT);
       const hiddenDates  = sortedDates.slice(LIMIT);
 
-      const renderDateItem = (d, i) => {
+      const renderDateItem = (d) => {
         const count = state.tallies[d.id] || 0;
         const pct   = total ? Math.round((count / total) * 100) : 0;
         const f     = fmtDate(d.date);
         const isLeader = hasRealLeader && count === max;
+        const rank = sortedDates.filter(x => (state.tallies[x.id] || 0) > count).length + 1;
+        const rankLabel = hasRealLeader ? `${rank}.` : '';
         const voters = state.votes
           .filter(v => v.date_ids.includes(d.id))
           .map(v => `${esc(v.first_name)} ${esc(v.last_name)}`)
@@ -1473,7 +1475,7 @@
         return `
           <div class="date-item${isLeader ? ' leader' : ''}">
             <div class="date-item-header">
-              <span class="td-rank">${i + 1}.</span>
+              <span class="td-rank">${rankLabel}</span>
               <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
               <span class="td-score">${count}/${total} · ${pct}%</span>
               <span class="td-chevron">▾</span>
@@ -1483,8 +1485,8 @@
           </div>`;
       };
 
-      const visibleHTML = visibleDates.map((d, i) => renderDateItem(d, i)).join('');
-      const hiddenHTML  = hiddenDates.map((d, i) => renderDateItem(d, i + LIMIT)).join('');
+      const visibleHTML = visibleDates.map(d => renderDateItem(d)).join('');
+      const hiddenHTML  = hiddenDates.map(d => renderDateItem(d)).join('');
       const overflowBlock = hiddenDates.length > 0
         ? `<div class="dates-overflow hidden" id="dates-overflow">${hiddenHTML}</div>
            <button class="bars-toggle" id="dates-toggle">${t('showMore', hiddenDates.length)}</button>`
