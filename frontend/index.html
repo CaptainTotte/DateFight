@@ -231,7 +231,7 @@
     /* Results list */
     .top-dates { margin-bottom: 28px; }
     .td-name { font-weight: 600; flex: 1; }
-    .td-bar-track { height: 10px; background: var(--bg-elev); border-radius: 5px; overflow: hidden; margin-bottom: 2px; }
+    .td-bar-track { height: 10px; background: var(--bg-elev); border-radius: 5px; overflow: hidden; margin: 2px 0 10px; }
     .td-bar-fill {
       height: 100%; width: 0; border-radius: 3px;
       background: var(--accent);
@@ -251,20 +251,19 @@
     .date-group.leader .td-bar-fill { background: var(--green); }
 
     /* Accordion date items */
-    .date-item { cursor: pointer; user-select: none; border-top: 1px solid var(--border); border-radius: 6px; }
+    .date-item { cursor: pointer; user-select: none; border-top: 1px solid var(--border); }
     .date-group .date-item:first-of-type { border-top: none; }
-    .date-item:hover { background: rgba(255,255,255,0.04); }
     .date-item-header {
       display: flex; align-items: center; gap: 10px;
       padding: 10px 0 4px; font-size: 14px;
     }
     .td-name-col { display: flex; flex-direction: column; gap: 3px; flex: 1; }
-    .voter-preview { font-size: 12px; color: var(--muted); }
+    .voter-preview { font-size: 12px; color: var(--muted); padding-bottom: 6px; }
     .date-item.open .voter-preview { display: none; }
     .td-chevron { color: var(--muted); font-size: 14px; transition: transform .2s, color .15s; flex-shrink: 0; }
     .date-item:hover .td-chevron { color: var(--text); }
     .date-item.open .td-chevron { transform: rotate(180deg); color: var(--text); }
-    .date-item-voters { display: none; padding: 4px 0 12px; }
+    .date-item-voters { display: none; padding: 4px 0 8px; }
     .date-item.open .date-item-voters { display: block; }
     .name-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .name-chip {
@@ -1513,8 +1512,8 @@
                 </div>
                 <span class="td-chevron">▾</span>
               </div>
-              <div class="td-bar-track"><div class="td-bar-fill" data-pct="${g.pct}"></div></div>
               <div class="date-item-voters"><div class="name-chips">${chipsHTML || '—'}</div></div>
+              <div class="td-bar-track"><div class="td-bar-fill" data-pct="${g.pct}"></div></div>
             </div>`;
         }).join('');
         return `
