@@ -242,7 +242,7 @@
     .medal { font-size: 16px; line-height: 1; }
     .td-name { font-weight: 600; font-size: 14px; flex: 1; }
     .td-score-inline { font-size: 13px; color: var(--muted); }
-    .name-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 7px; }
+    .name-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
     .name-chip { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: 12px; color: var(--text); }
 
     /* Bar */
@@ -1490,8 +1490,8 @@
                 <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
                 <span class="td-score-inline">${g.count}/${total} · ${g.pct}%</span>
               </div>
-              ${chipsHTML ? `<div class="name-chips">${chipsHTML}</div>` : ''}
               <div class="td-bar-track"><div class="td-bar-fill" data-pct="${g.pct}"></div></div>
+              ${chipsHTML ? `<div class="name-chips">${chipsHTML}</div>` : ''}
             </div>`;
         }).join('');
         return `<div class="date-group${isLeader ? ' leader' : ''}">${datesHTML}</div>`;
