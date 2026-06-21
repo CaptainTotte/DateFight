@@ -230,19 +230,12 @@
 
     /* Results list */
     .top-dates { margin-bottom: 28px; }
-    .td-name { font-weight: 600; flex: 1; }
-    .td-bar-track { height: 10px; background: var(--bg-elev); border-radius: 5px; overflow: hidden; margin: 2px 0 10px; }
-    .td-bar-fill {
-      height: 100%; width: 0; border-radius: 3px;
-      background: var(--accent);
-      transition: width .9s cubic-bezier(.22,.61,.36,1);
-    }
 
     /* Score groups */
     .date-group { margin-bottom: 4px; }
     .date-group-header {
       display: flex; align-items: baseline; gap: 8px;
-      padding: 12px 0 6px; border-top: 1px solid var(--border);
+      padding: 10px 0 5px; border-top: 1px solid var(--border);
     }
     .date-group:first-child .date-group-header { border-top: none; }
     .td-rank { font-size: 15px; font-weight: 700; color: var(--text); }
@@ -250,25 +243,23 @@
     .date-group.leader .td-rank { color: var(--green); }
     .date-group.leader .td-bar-fill { background: var(--green); }
 
-    /* Accordion date items */
-    .date-item { cursor: pointer; user-select: none; border-top: 1px solid var(--border); }
+    /* Date items (static, no accordion) */
+    .date-item { border-top: 1px solid var(--border); padding: 8px 0; }
     .date-group .date-item:first-of-type { border-top: none; }
-    .date-item-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 0 4px; font-size: 14px;
+    .td-name { font-weight: 600; font-size: 14px; display: block; margin-bottom: 5px; }
+    .name-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 7px; }
+    .name-chip { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: 12px; color: var(--text); }
+
+    /* Bar with text overlay */
+    .td-bar-track { height: 22px; background: var(--bg-elev); border-radius: 5px; overflow: hidden; position: relative; }
+    .td-bar-fill {
+      height: 100%; width: 0; border-radius: 5px;
+      background: var(--accent);
+      transition: width .9s cubic-bezier(.22,.61,.36,1);
     }
-    .td-name-col { display: flex; flex-direction: column; gap: 3px; flex: 1; }
-    .voter-preview { font-size: 12px; color: var(--muted); padding-bottom: 6px; }
-    .date-item.open .voter-preview { display: none; }
-    .td-chevron { color: var(--muted); font-size: 14px; transition: transform .2s, color .15s; flex-shrink: 0; }
-    .date-item:hover .td-chevron { color: var(--text); }
-    .date-item.open .td-chevron { transform: rotate(180deg); color: var(--text); }
-    .date-item-voters { display: none; padding: 4px 0 8px; }
-    .date-item.open .date-item-voters { display: block; }
-    .name-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .name-chip {
-      border: 1px solid var(--border); border-radius: 6px;
-      padding: 3px 10px; font-size: 12px; color: var(--text);
+    .bar-label {
+      position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+      font-size: 11px; font-weight: 600; color: var(--muted); pointer-events: none;
     }
     .bars-toggle {
       display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -1496,24 +1487,18 @@
       const renderGroup = (g, isLeader) => {
         const datesHTML = g.dates.map(d => {
           const f = fmtDate(d.date);
-          const voterList = state.votes.filter(v => v.date_ids.includes(d.id));
-          const previewNames = voterList.map(v => esc(v.first_name));
-          const preview = previewNames.length === 0 ? '' :
-            previewNames.length <= 2 ? previewNames.join(', ') :
-            `${previewNames.slice(0, 2).join(', ')} +${previewNames.length - 2}`;
-          const chipsHTML = voterList.map(v =>
-            `<span class="name-chip">${esc(v.first_name)} ${esc(v.last_name)}</span>`).join('');
+          const chipsHTML = state.votes
+            .filter(v => v.date_ids.includes(d.id))
+            .map(v => `<span class="name-chip">${esc(v.first_name)} ${esc(v.last_name)}</span>`)
+            .join('');
           return `
             <div class="date-item">
-              <div class="date-item-header">
-                <div class="td-name-col">
-                  <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
-                  ${preview ? `<span class="voter-preview">${preview}</span>` : ''}
-                </div>
-                <span class="td-chevron">▾</span>
+              <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
+              ${chipsHTML ? `<div class="name-chips">${chipsHTML}</div>` : ''}
+              <div class="td-bar-track">
+                <div class="td-bar-fill" data-pct="${g.pct}"></div>
+                <span class="bar-label">${g.count}/${total} · ${g.pct}%</span>
               </div>
-              <div class="date-item-voters"><div class="name-chips">${chipsHTML || '—'}</div></div>
-              <div class="td-bar-track"><div class="td-bar-fill" data-pct="${g.pct}"></div></div>
             </div>`;
         }).join('');
         return `
@@ -1547,12 +1532,6 @@
     function wireResults(hiddenCount) {
       requestAnimationFrame(() => {
         document.querySelectorAll('.td-bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
-      });
-
-      document.querySelectorAll('.date-item-header').forEach(header => {
-        header.addEventListener('click', () => {
-          header.closest('.date-item').classList.toggle('open');
-        });
       });
 
       const toggle = document.getElementById('dates-toggle');
