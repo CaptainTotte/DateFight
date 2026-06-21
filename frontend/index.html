@@ -127,7 +127,7 @@
     .help { text-align: center; margin-top: 22px; }
     .help a { color: var(--accent); text-decoration: none; font-size: 14px; }
 
-    /* Vote calendar (single-month, read-only navigation) */
+    /* Vote calendar */
     .cal-nav-row {
       display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;
     }
@@ -139,9 +139,7 @@
     .cal-nav-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
     .cal-nav-btn:disabled { opacity: .3; cursor: default; }
     .cal-nav-title { font-size: 16px; font-weight: 700; }
-    .cal-grid {
-      display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
-    }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
     .cal-dow {
       text-align: center; font-size: 11px; font-weight: 600;
       color: var(--muted); text-transform: uppercase;
@@ -176,7 +174,7 @@
     .cal-legend .dot-g { background: var(--green); }
     .cal-legend .dot-m { background: #3c3d47; }
 
-    /* Drag-select calendar picker (create / manage) */
+    /* Drag-select calendar picker */
     .cal {
       background: var(--bg-elev); border: 1px solid var(--border);
       border-radius: 12px; padding: 16px; user-select: none; touch-action: none;
@@ -199,10 +197,7 @@
     .cal-day.muted-day { color: #4a4b55; cursor: default; }
     .cal-day.muted-day:hover { background: transparent; }
     .cal-day.today { border-color: var(--border); }
-    .cal-day.selected {
-      background: var(--accent); color: #fff; font-weight: 700;
-      border-color: var(--accent);
-    }
+    .cal-day.selected { background: var(--accent); color: #fff; font-weight: 700; border-color: var(--accent); }
     .cal-day.selected:hover { background: var(--accent); }
     .cal-hint { font-size: 12px; color: var(--muted); margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
     .link-btn {
@@ -210,7 +205,7 @@
       cursor: pointer; font-family: inherit; font-size: 14px; padding: 0;
     }
 
-    /* Code boxes (after creating an event) */
+    /* Code boxes */
     .code-box {
       background: var(--accent-soft); border: 1px solid var(--accent);
       border-radius: 12px; padding: 22px; text-align: center; margin-top: 12px;
@@ -234,22 +229,18 @@
     }
     .bar-head .lbl { font-weight: 600; }
     .bar-head .cnt { color: var(--muted); font-size: 13px; }
-    .bar-track {
-      height: 22px; background: var(--bg-elev);
-      border-radius: 8px; overflow: hidden;
-    }
+    .bar-track { height: 22px; background: var(--bg-elev); border-radius: 8px; overflow: hidden; }
     .bar-fill {
       height: 100%; width: 0;
       background: var(--accent);
       border-radius: 8px;
       transition: width .9s cubic-bezier(.22,.61,.36,1);
       display: flex; align-items: center; padding-left: 12px;
-      font-size: 13px; font-weight: 700; color: #fff;
-      white-space: nowrap;
+      font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap;
     }
     .bar-row.leader .bar-fill { background: var(--green); }
     .bar-row.leader .lbl::after {
-      content: 'Leder'; margin-left: 8px; font-size: 11px;
+      content: attr(data-leader-label); margin-left: 8px; font-size: 11px;
       color: var(--green); background: var(--green-soft);
       padding: 2px 8px; border-radius: 20px; font-weight: 600;
     }
@@ -263,10 +254,7 @@
     .bars-toggle:hover { border-color: var(--accent); color: var(--accent); }
 
     .voters { margin-top: 28px; }
-    .voter {
-      padding: 14px 0; border-top: 1px solid var(--border);
-      display: flex; flex-direction: column; gap: 8px;
-    }
+    .voter { padding: 14px 0; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
     .voter .vname { font-weight: 600; }
     .chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .chip.picked {
@@ -279,6 +267,7 @@
     .mb { margin-bottom: 24px; }
     .hidden { display: none !important; }
     .desc { color: var(--muted); margin-top: 8px; }
+
     .topbar {
       position: relative;
       display: flex;
@@ -286,32 +275,33 @@
       align-items: flex-end;
       margin-bottom: 0;
     }
-    .bottom-nav {
-      display: flex; justify-content: center; margin-top: 24px;
+    #lang-btn {
+      position: absolute; right: 0; bottom: 30px;
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 600;
+      font-family: inherit; cursor: pointer; transition: border-color .15s, color .15s;
     }
+    #lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .bottom-nav { display: flex; justify-content: center; margin-top: 24px; }
     #change-event {
       background: var(--accent); color: #13141A;
       border: none; border-radius: 10px;
       padding: 11px 22px; font-size: 14px; font-weight: 600;
-      font-family: inherit; cursor: pointer;
-      transition: filter .15s;
+      font-family: inherit; cursor: pointer; transition: filter .15s;
     }
     #change-event:hover { filter: brightness(1.1); }
+
     .footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 48px; }
     .footer a { color: var(--muted); }
-    .divider {
-      border: none; border-top: 1px solid var(--border); margin: 32px 0;
-    }
-    .results-title {
-      font-size: 17px; font-weight: 700; margin-bottom: 20px;
-    }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+    .results-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
     .voted-confirm {
       display: flex; align-items: center; gap: 10px;
       background: rgba(52,209,127,0.08); border: 1px solid rgba(52,209,127,0.25);
       border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;
       font-size: 14px; color: var(--green);
     }
-
     .toast {
       position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
       background: var(--bg-elev); border: 1px solid var(--accent); color: var(--text);
@@ -325,38 +315,237 @@
   <div class="wrap">
     <div class="topbar">
       <div class="brand"><img src="/img/image.png" alt="DateFight" /></div>
+      <button id="lang-btn">EN</button>
     </div>
     <div id="app"></div>
     <div class="bottom-nav">
       <button class="hidden" id="change-event">← Till start</button>
     </div>
-    <div class="footer">© 2026 DateFight · Hitta dagen som funkar för alla<br><a href="https://github.com/CaptainTotte/DateFight" target="_blank" rel="noopener">GitHub</a></div>
+    <div class="footer"><span id="footer-text">© 2026 DateFight · Hitta dagen som funkar för alla</span><br><a href="https://github.com/CaptainTotte/DateFight" target="_blank" rel="noopener">GitHub</a></div>
   </div>
   <div class="toast" id="toast"></div>
 
   <script>
+    /* ================================================================
+       Translations
+    ================================================================ */
+    let lang = localStorage.getItem('df_lang') || 'sv';
+
+    const T = {
+      sv: {
+        months:       ['Januari','Februari','Mars','April','Maj','Juni','Juli','Augusti','September','Oktober','November','December'],
+        monthsShort:  ['Jan','Feb','Mar','Apr','Maj','Jun','Jul','Aug','Sep','Okt','Nov','Dec'],
+        dows:         ['Sön','Mån','Tis','Ons','Tor','Fre','Lör'],
+        dowsHdr:      ['Mån','Tis','Ons','Tor','Fre','Lör','Sön'],
+        leder:        'Leder',
+        landingHead:  'Gå med eller hantera',
+        landingDesc:  'Ange din 4-teckens kod — röstkod eller admin-kod.',
+        continueBtn:  'Fortsätt →',
+        createBtn:    '+ Skapa nytt event',
+        helpLink:     'Behöver du hjälp?',
+        errCode4:     'Koden är 4 tecken.',
+        errNoEvent:   'Hittade inget event med den koden.',
+        errGeneral:   'Något gick fel. Försök igen.',
+        createHead:   'Skapa nytt event',
+        labelTitle:   'Titel',
+        titlePh:      'Middag med kusinerna',
+        labelDesc:    'Beskrivning (valfritt)',
+        descPh:       'Lite info till gästerna…',
+        labelDates:   'Föreslagna datum',
+        createSubmit: 'Skapa event',
+        creating:     'Skapar…',
+        calClear:     'Rensa',
+        calCount:     (n) => `${n} datum valda`,
+        errTitle:     'Titel krävs.',
+        errDates:     'Välj minst ett datum i kalendern.',
+        errCreate:    'Kunde inte skapa eventet.',
+        voteCodeLbl:  'Röstkod — dela denna med gästerna',
+        adminCodeLbl: 'Admin-kod — spara för att redigera senare',
+        copyVoteBtn:  '📋 Kopiera röstkod',
+        copyAdminBtn: '📋 Kopiera admin-kod',
+        openEventBtn: 'Öppna eventet →',
+        copied:       'Kopierat!',
+        voteCalHead:  'Vilka dagar kan du?',
+        labelFirst:   'Förnamn',
+        firstPh:      'Anna',
+        labelLast:    'Efternamn',
+        lastPh:       'Andersson',
+        submitBtn:    'Skicka röst ▷',
+        submitting:   'Skickar…',
+        legendAvail:  'Tillgängligt datum',
+        legendNa:     'Inte ett alternativ',
+        alreadyVoted: '✓ Du har redan röstat på det här eventet',
+        justVoted:    '✓ Din röst är registrerad!',
+        errNames:     'Fyll i för- och efternamn.',
+        errPickDay:   'Välj minst en dag.',
+        errSubmit:    'Kunde inte skicka rösten.',
+        resultsTitle: (n) => `Resultat · ${n} ${n === 1 ? 'röst' : 'röster'}`,
+        votesPct:     (n, pct) => `${n} röster · ${pct}%`,
+        noVotes:      'Inga röster än.',
+        whoWhen:      'Vem kan när?',
+        noVoters:     'Ingen har röstat än.',
+        noDates:      'Valde inga datum',
+        showMore:     (n) => `Visa ${n} datum till ▾`,
+        showLess:     'Dölj ▴',
+        manageHead:   'Hantera event',
+        labelDescM:   'Beskrivning',
+        labelDatesM:  'Datum',
+        saveBtn:      'Spara ändringar',
+        saving:       'Sparar…',
+        deleteBtn:    'Ta bort event',
+        confirmDel:   'Ta bort eventet och alla röster? Detta går inte att ångra.',
+        toastSaved:   'Ändringar sparade ✓',
+        toastDeleted: 'Event borttaget',
+        toastNoAuth:  'Behörighet saknas',
+        toastNoSave:  'Kunde inte spara',
+        toastNoDel:   'Kunde inte ta bort',
+        errTitleM:    'Titel krävs.',
+        errDatesM:    'Välj minst ett datum.',
+        errAuth:      'Behörighet saknas.',
+        errSave:      'Kunde inte spara.',
+        backBtn:      '← Till start',
+        footer:       '© 2026 DateFight · Hitta dagen som funkar för alla',
+        langBtn:      'EN',
+      },
+      en: {
+        months:       ['January','February','March','April','May','June','July','August','September','October','November','December'],
+        monthsShort:  ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        dows:         ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+        dowsHdr:      ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+        leder:        'Leading',
+        landingHead:  'Join or manage an event',
+        landingDesc:  'Enter your 4-character code — voting code or admin code.',
+        continueBtn:  'Continue →',
+        createBtn:    '+ Create new event',
+        helpLink:     'Need help?',
+        errCode4:     'The code is 4 characters.',
+        errNoEvent:   'No event found with that code.',
+        errGeneral:   'Something went wrong. Please try again.',
+        createHead:   'Create new event',
+        labelTitle:   'Title',
+        titlePh:      "Birthday dinner at Anna's",
+        labelDesc:    'Description (optional)',
+        descPh:       'Some info for the guests…',
+        labelDates:   'Suggested dates',
+        createSubmit: 'Create event',
+        creating:     'Creating…',
+        calClear:     'Clear',
+        calCount:     (n) => `${n} date${n !== 1 ? 's' : ''} selected`,
+        errTitle:     'Title is required.',
+        errDates:     'Pick at least one date on the calendar.',
+        errCreate:    'Could not create the event.',
+        voteCodeLbl:  'Voting code — share this with your guests',
+        adminCodeLbl: 'Admin code — save this to edit later',
+        copyVoteBtn:  '📋 Copy voting code',
+        copyAdminBtn: '📋 Copy admin code',
+        openEventBtn: 'Open event →',
+        copied:       'Copied!',
+        voteCalHead:  'Which days work for you?',
+        labelFirst:   'First name',
+        firstPh:      'Anna',
+        labelLast:    'Last name',
+        lastPh:       'Andersson',
+        submitBtn:    'Submit vote ▷',
+        submitting:   'Submitting…',
+        legendAvail:  'Available date',
+        legendNa:     'Not an option',
+        alreadyVoted: '✓ You have already voted on this event',
+        justVoted:    '✓ Your vote has been registered!',
+        errNames:     'Please enter your first and last name.',
+        errPickDay:   'Pick at least one day.',
+        errSubmit:    'Could not submit your vote.',
+        resultsTitle: (n) => `Results · ${n} ${n === 1 ? 'vote' : 'votes'}`,
+        votesPct:     (n, pct) => `${n} votes · ${pct}%`,
+        noVotes:      'No votes yet.',
+        whoWhen:      'Who can when?',
+        noVoters:     'No one has voted yet.',
+        noDates:      'Chose no dates',
+        showMore:     (n) => `Show ${n} more ▾`,
+        showLess:     'Show less ▴',
+        manageHead:   'Manage event',
+        labelDescM:   'Description',
+        labelDatesM:  'Dates',
+        saveBtn:      'Save changes',
+        saving:       'Saving…',
+        deleteBtn:    'Delete event',
+        confirmDel:   'Delete event and all votes? This cannot be undone.',
+        toastSaved:   'Changes saved ✓',
+        toastDeleted: 'Event deleted',
+        toastNoAuth:  'Unauthorized',
+        toastNoSave:  'Could not save',
+        toastNoDel:   'Could not delete',
+        errTitleM:    'Title is required.',
+        errDatesM:    'Pick at least one date.',
+        errAuth:      'Unauthorized.',
+        errSave:      'Could not save.',
+        backBtn:      '← Back to start',
+        footer:       '© 2026 DateFight · Find the day that works for everyone',
+        langBtn:      'SV',
+      },
+    };
+
+    function t(key, ...args) {
+      const val = T[lang][key];
+      return typeof val === 'function' ? val(...args) : (val ?? key);
+    }
+
+    /* ================================================================
+       App state
+    ================================================================ */
     const API = '/api';
     const app = document.getElementById('app');
     const changeBtn = document.getElementById('change-event');
+    const langBtn = document.getElementById('lang-btn');
+    const footerText = document.getElementById('footer-text');
     const state = { event: null, dates: [], tallies: {}, votes: [], selected: new Set() };
     let calYear = 0, calMonth = 0;
     let adminCode = '';
+    let currentView = 'landing';
+    let currentJustVoted = false;
+    let currentAlreadyVoted = false;
+
+    /* ================================================================
+       Language switcher
+    ================================================================ */
+    function applyLang() {
+      document.documentElement.lang = lang;
+      langBtn.textContent = t('langBtn');
+      changeBtn.textContent = t('backBtn');
+      footerText.textContent = t('footer');
+    }
+
+    function switchLang() {
+      lang = lang === 'sv' ? 'en' : 'sv';
+      localStorage.setItem('df_lang', lang);
+      applyLang();
+      rerenderCurrent();
+    }
+
+    function rerenderCurrent() {
+      if (currentView === 'landing') renderLanding();
+      else if (currentView === 'create') renderCreate();
+      else if (currentView === 'vote') renderPage(currentJustVoted, currentAlreadyVoted);
+      else if (currentView === 'manage') renderManage({
+        event: { ...state.event, admin_code: adminCode },
+        dates: state.dates, tallies: state.tallies, votes: state.votes,
+      });
+    }
+
+    langBtn.addEventListener('click', switchLang);
+    applyLang();
 
     changeBtn.addEventListener('click', () => {
       location.hash = '';
       renderLanding();
     });
 
-    const MONTHS = ['Jan','Feb','Mar','Apr','Maj','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
-    const DOW = ['Sön','Mån','Tis','Ons','Tor','Fre','Lör'];
-    const MONTH_NAMES = ['Januari','Februari','Mars','April','Maj','Juni',
-                         'Juli','Augusti','September','Oktober','November','December'];
-    const DOW_HDR = ['Mån','Tis','Ons','Tor','Fre','Lör','Sön'];
-
+    /* ================================================================
+       Utilities
+    ================================================================ */
     function fmtDate(iso) {
       const d = new Date(iso + 'T00:00:00');
       if (isNaN(d)) return { dow: '', day: iso, mon: '' };
-      return { dow: DOW[d.getDay()], day: d.getDate(), mon: MONTHS[d.getMonth()] };
+      return { dow: t('dows')[d.getDay()], day: d.getDate(), mon: t('monthsShort')[d.getMonth()] };
     }
     function esc(s) {
       return String(s).replace(/[&<>"']/g, c =>
@@ -375,34 +564,36 @@
         autoExpand(ta);
       });
     }
-
     function toast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg; t.classList.add('show');
-      clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 1800);
+      const el = document.getElementById('toast');
+      el.textContent = msg; el.classList.add('show');
+      clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 1800);
     }
     function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => toast('Kopierat!')).catch(() => {});
+      navigator.clipboard.writeText(text).then(() => toast(t('copied'))).catch(() => {});
     }
 
-    /* ---------------- Landing ---------------- */
+    /* ================================================================
+       Landing
+    ================================================================ */
     function renderLanding() {
+      currentView = 'landing';
       changeBtn.classList.add('hidden');
       app.innerHTML = `
         <div class="card landing center">
           <div class="icon-badge">👥</div>
-          <h2>Gå med eller hantera</h2>
-          <p class="muted" style="margin:8px 0 24px">Ange din 4-teckens kod — röstkod eller admin-kod.</p>
+          <h2>${t('landingHead')}</h2>
+          <p class="muted" style="margin:8px 0 24px">${t('landingDesc')}</p>
           <div class="field">
             <input class="code" id="code" maxlength="4" placeholder="––––" autocomplete="off" />
           </div>
-          <button class="btn" id="join">Fortsätt →</button>
+          <button class="btn" id="join">${t('continueBtn')}</button>
           <div class="err" id="err"></div>
           <div style="margin-top:20px">
-            <button class="link-btn" id="go-create">+ Skapa nytt event</button>
+            <button class="link-btn" id="go-create">${t('createBtn')}</button>
           </div>
         </div>
-        <div class="help"><a href="#">Behöver du hjälp?</a></div>`;
+        <div class="help"><a href="#">${t('helpLink')}</a></div>`;
 
       const codeInput = document.getElementById('code');
       codeInput.focus();
@@ -417,14 +608,13 @@
         const code = codeInput.value.trim().toUpperCase();
         const err = document.getElementById('err');
         err.textContent = '';
-        if (code.length < 4) { err.textContent = 'Koden är 4 tecken.'; return; }
+        if (code.length < 4) { err.textContent = t('errCode4'); return; }
         try {
           const r = await fetch(`${API}/events/resolve/${code}`);
-          if (!r.ok) { err.textContent = 'Hittade inget event med den koden.'; return; }
-          // Router re-fetches + renders the right view based on mode.
+          if (!r.ok) { err.textContent = t('errNoEvent'); return; }
           location.hash = '#' + code;
         } catch {
-          err.textContent = 'Något gick fel. Försök igen.';
+          err.textContent = t('errGeneral');
         }
       }
     }
@@ -436,25 +626,28 @@
       try { localStorage.setItem('voted_' + code, '1'); } catch {}
     }
 
-    /* ---------------- Create event ---------------- */
+    /* ================================================================
+       Create event
+    ================================================================ */
     function renderCreate() {
+      currentView = 'create';
       changeBtn.classList.remove('hidden');
       app.innerHTML = `
         <div class="card">
-          <h2 class="mb">Skapa nytt event</h2>
+          <h2 class="mb">${t('createHead')}</h2>
           <div class="field">
-            <label>Titel</label>
-            <input class="text" id="title" placeholder="Middag med kusinerna" />
+            <label>${t('labelTitle')}</label>
+            <input class="text" id="title" placeholder="${esc(t('titlePh'))}" />
           </div>
           <div class="field">
-            <label>Beskrivning (valfritt)</label>
-            <textarea id="description" placeholder="Lite info till gästerna…"></textarea>
+            <label>${t('labelDesc')}</label>
+            <textarea id="description" placeholder="${esc(t('descPh'))}"></textarea>
           </div>
           <div class="field">
-            <label>Föreslagna datum</label>
+            <label>${t('labelDates')}</label>
             <div class="cal" id="picker-cal"></div>
           </div>
-          <button class="btn" id="create">Skapa event</button>
+          <button class="btn" id="create">${t('createSubmit')}</button>
           <div class="err" id="err"></div>
           <div id="created"></div>
         </div>`;
@@ -470,11 +663,11 @@
       const dates = [...picker.selected].sort();
       const err = document.getElementById('err');
       err.textContent = '';
-      if (!title) { err.textContent = 'Titel krävs.'; return; }
-      if (dates.length === 0) { err.textContent = 'Välj minst ett datum i kalendern.'; return; }
+      if (!title) { err.textContent = t('errTitle'); return; }
+      if (dates.length === 0) { err.textContent = t('errDates'); return; }
 
       const btn = document.getElementById('create');
-      btn.disabled = true; btn.textContent = 'Skapar…';
+      btn.disabled = true; btn.textContent = t('creating');
       try {
         const r = await fetch(`${API}/events`, {
           method: 'POST',
@@ -485,8 +678,8 @@
         const data = await r.json();
         showCreated(data.code, data.admin_code);
       } catch {
-        err.textContent = 'Kunde inte skapa eventet.';
-        btn.disabled = false; btn.textContent = 'Skapa event';
+        err.textContent = t('errCreate');
+        btn.disabled = false; btn.textContent = t('createSubmit');
       }
     }
 
@@ -495,22 +688,24 @@
       const el = document.getElementById('created');
       el.innerHTML = `
         <div class="code-box">
-          <div class="lbl">Röstkod — dela denna med gästerna</div>
+          <div class="lbl">${t('voteCodeLbl')}</div>
           <div class="code">${esc(code)}</div>
-          <button class="btn sm" id="copy-code">📋 Kopiera röstkod</button>
+          <button class="btn sm" id="copy-code">${t('copyVoteBtn')}</button>
         </div>
         <div class="code-box admin">
-          <div class="lbl">Admin-kod — spara för att redigera senare</div>
+          <div class="lbl">${t('adminCodeLbl')}</div>
           <div class="code">${esc(admin)}</div>
-          <button class="btn sm" id="copy-admin">📋 Kopiera admin-kod</button>
+          <button class="btn sm" id="copy-admin">${t('copyAdminBtn')}</button>
         </div>
-        <button class="btn mt" id="open-event">Öppna eventet →</button>`;
+        <button class="btn mt" id="open-event">${t('openEventBtn')}</button>`;
       document.getElementById('copy-code').addEventListener('click', () => copyToClipboard(code));
       document.getElementById('copy-admin').addEventListener('click', () => copyToClipboard(admin));
       document.getElementById('open-event').addEventListener('click', () => { location.hash = '#' + code; });
     }
 
-    /* ---------------- Drag-select calendar picker ---------------- */
+    /* ================================================================
+       Drag-select calendar picker
+    ================================================================ */
     const picker = { view: new Date(), selected: new Set(), dragging: false, mode: 'add' };
     document.addEventListener('pointerup', () => { picker.dragging = false; });
 
@@ -532,7 +727,7 @@
       if (picker.mode === 'add') { picker.selected.add(date); el.classList.add('selected'); }
       else { picker.selected.delete(date); el.classList.remove('selected'); }
       const c = document.getElementById('picker-count');
-      if (c) c.textContent = `${picker.selected.size} datum valda`;
+      if (c) c.textContent = t('calCount', picker.selected.size);
     }
 
     function renderPicker() {
@@ -543,7 +738,7 @@
       const startOffset = (new Date(year, month, 1).getDay() + 6) % 7;
       const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-      let cells = DOW_HDR.map(d => `<div class="cal-dow">${d}</div>`).join('');
+      let cells = t('dowsHdr').map(d => `<div class="cal-dow">${d}</div>`).join('');
       for (let i = 0; i < startOffset; i++) cells += `<div class="cal-day muted-day"></div>`;
       for (let day = 1; day <= daysInMonth; day++) {
         const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
@@ -556,13 +751,13 @@
       el.innerHTML = `
         <div class="cal-head">
           <button class="cal-nav" data-nav="-1" type="button">‹</button>
-          <div class="cal-title">${MONTH_NAMES[month]} ${year}</div>
+          <div class="cal-title">${t('months')[month]} ${year}</div>
           <button class="cal-nav" data-nav="1" type="button">›</button>
         </div>
         <div class="cal-grid">${cells}</div>
         <div class="cal-hint">
-          <span id="picker-count">${picker.selected.size} datum valda</span>
-          <button class="link-btn" id="picker-clear" type="button">Rensa</button>
+          <span id="picker-count">${t('calCount', picker.selected.size)}</span>
+          <button class="link-btn" id="picker-clear" type="button">${t('calClear')}</button>
         </div>`;
 
       el.querySelectorAll('[data-nav]').forEach(btn =>
@@ -591,7 +786,9 @@
       });
     }
 
-    /* ---------------- Load a vote event ---------------- */
+    /* ================================================================
+       Vote event loader
+    ================================================================ */
     function loadEvent(data) {
       state.event = data.event;
       state.dates = data.dates;
@@ -606,7 +803,9 @@
       renderPage(false, hasVoted(data.event.code));
     }
 
-    /* ---------------- Vote calendar (single-month) ---------------- */
+    /* ================================================================
+       Vote calendar (single-month)
+    ================================================================ */
     function renderCalView() {
       const container = document.getElementById('cal-view');
       if (!container || !state.dates.length) return;
@@ -627,7 +826,7 @@
         if (k > curKey) hasLater = true;
       });
 
-      let cells = DOW_HDR.map(d => `<div class="cal-dow">${d}</div>`).join('');
+      let cells = t('dowsHdr').map(d => `<div class="cal-dow">${d}</div>`).join('');
       for (let i = 0; i < startOffset; i++) cells += `<div class="cal-d empty"></div>`;
       for (let day = 1; day <= daysInMonth; day++) {
         const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
@@ -643,13 +842,13 @@
       container.innerHTML = `
         <div class="cal-nav-row">
           <button class="cal-nav-btn" id="cal-prev" ${hasEarlier ? '' : 'disabled'}>‹</button>
-          <span class="cal-nav-title">${MONTH_NAMES[month]} ${year}</span>
+          <span class="cal-nav-title">${t('months')[month]} ${year}</span>
           <button class="cal-nav-btn" id="cal-next" ${hasLater ? '' : 'disabled'}>›</button>
         </div>
         <div class="cal-grid">${cells}</div>
         <div class="cal-legend">
-          <span><i class="dot-g"></i> Tillgängligt datum</span>
-          <span><i class="dot-m"></i> Inte ett alternativ</span>
+          <span><i class="dot-g"></i> ${t('legendAvail')}</span>
+          <span><i class="dot-m"></i> ${t('legendNa')}</span>
         </div>`;
 
       document.getElementById('cal-prev').addEventListener('click', () => changeMonth(-1));
@@ -671,7 +870,9 @@
       renderCalView();
     }
 
-    /* ---------------- Results (shared by vote + manage) ---------------- */
+    /* ================================================================
+       Results (shared)
+    ================================================================ */
     function buildResultsHTML() {
       const total = state.votes.length;
       const max = Math.max(0, ...Object.values(state.tallies));
@@ -689,8 +890,8 @@
         return `
           <div class="bar-row ${leader ? 'leader' : ''}">
             <div class="bar-head">
-              <span class="lbl">${f.dow} ${f.day} ${esc(f.mon)}</span>
-              <span class="cnt">${count} röster · ${pct}%</span>
+              <span class="lbl" ${leader ? `data-leader-label="${esc(t('leder'))}"` : ''}>${f.dow} ${f.day} ${esc(f.mon)}</span>
+              <span class="cnt">${t('votesPct', count, pct)}</span>
             </div>
             <div class="bar-track"><div class="bar-fill" data-pct="${pct}">${pct > 12 ? pct + '%' : ''}</div></div>
           </div>`;
@@ -699,7 +900,7 @@
       const bars = barItems.length === 0 ? '' :
         barItems.slice(0, BARS_LIMIT).join('') +
         (hiddenCount > 0 ? `<div class="bars-overflow hidden" id="bars-overflow">${barItems.slice(BARS_LIMIT).join('')}</div>
-          <button class="bars-toggle" id="bars-toggle">Visa ${hiddenCount} datum till ▾</button>` : '');
+          <button class="bars-toggle" id="bars-toggle">${t('showMore', hiddenCount)}</button>` : '');
 
       const voters = state.votes.map(v => {
         const picked = new Set(v.date_ids);
@@ -709,7 +910,7 @@
           return `<span class="chip picked">${f.dow} ${f.day} ${esc(f.mon)}</span>`;
         }).join('');
         const label = pickedDates.length === 0
-          ? '<span class="muted" style="font-size:13px">Valde inga datum</span>'
+          ? `<span class="muted" style="font-size:13px">${t('noDates')}</span>`
           : chips;
         return `
           <div class="voter">
@@ -719,11 +920,11 @@
       }).join('');
 
       const html = `
-        <div class="results-title">Resultat · ${total} ${total === 1 ? 'röst' : 'röster'}</div>
-        <div id="bars">${bars || '<p class="muted">Inga röster än.</p>'}</div>
+        <div class="results-title">${t('resultsTitle', total)}</div>
+        <div id="bars">${bars || `<p class="muted">${t('noVotes')}</p>`}</div>
         <div class="voters">
-          <h2 class="mb" style="margin-top:24px">Vem kan när?</h2>
-          ${voters || '<p class="muted">Ingen har röstat än.</p>'}
+          <h2 class="mb" style="margin-top:24px">${t('whoWhen')}</h2>
+          ${voters || `<p class="muted">${t('noVoters')}</p>`}
         </div>`;
       return { html, hiddenCount };
     }
@@ -734,7 +935,7 @@
         barsToggle.addEventListener('click', () => {
           const overflow = document.getElementById('bars-overflow');
           const open = overflow.classList.toggle('hidden') === false;
-          barsToggle.textContent = open ? 'Dölj ▴' : `Visa ${hiddenCount} datum till ▾`;
+          barsToggle.textContent = open ? t('showLess') : t('showMore', hiddenCount);
           if (open) requestAnimationFrame(() => {
             overflow.querySelectorAll('.bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
           });
@@ -745,8 +946,13 @@
       });
     }
 
-    /* ---------------- Vote + Results page ---------------- */
+    /* ================================================================
+       Vote + Results page
+    ================================================================ */
     function renderPage(justVoted = false, alreadyVoted = false) {
+      currentView = 'vote';
+      currentJustVoted = justVoted;
+      currentAlreadyVoted = alreadyVoted;
       changeBtn.classList.remove('hidden');
       const results = buildResultsHTML();
 
@@ -757,27 +963,27 @@
 
           ${alreadyVoted || justVoted ? `
           <div class="voted-confirm" style="margin-top:20px">
-            ✓ Du har redan röstat på det här eventet
+            ${t('alreadyVoted')}
           </div>` : `
           <div class="mt mb">
-            <h2 style="margin-bottom:14px">Vilka dagar kan du?</h2>
+            <h2 style="margin-bottom:14px">${t('voteCalHead')}</h2>
             <div id="cal-view"></div>
           </div>
           <div class="row mb">
             <div class="field" style="margin:0">
-              <label>Förnamn</label>
-              <input class="text" id="first" placeholder="Anna" autocomplete="given-name" />
+              <label>${t('labelFirst')}</label>
+              <input class="text" id="first" placeholder="${esc(t('firstPh'))}" autocomplete="given-name" />
             </div>
             <div class="field" style="margin:0">
-              <label>Efternamn</label>
-              <input class="text" id="last" placeholder="Andersson" autocomplete="family-name" />
+              <label>${t('labelLast')}</label>
+              <input class="text" id="last" placeholder="${esc(t('lastPh'))}" autocomplete="family-name" />
             </div>
           </div>
-          <button class="btn" id="submit">Skicka röst ▷</button>
+          <button class="btn" id="submit">${t('submitBtn')}</button>
           <div class="err" id="err"></div>`}
 
           <hr class="divider" />
-          ${justVoted ? '<div class="voted-confirm">✓ Din röst är registrerad!</div>' : ''}
+          ${justVoted ? `<div class="voted-confirm">${t('justVoted')}</div>` : ''}
           ${results.html}
         </div>`;
 
@@ -793,11 +999,11 @@
       const last = document.getElementById('last').value.trim();
       const err = document.getElementById('err');
       err.textContent = '';
-      if (!first || !last) { err.textContent = 'Fyll i för- och efternamn.'; return; }
-      if (state.selected.size === 0) { err.textContent = 'Välj minst en dag.'; return; }
+      if (!first || !last) { err.textContent = t('errNames'); return; }
+      if (state.selected.size === 0) { err.textContent = t('errPickDay'); return; }
 
       const btn = document.getElementById('submit');
-      btn.disabled = true; btn.textContent = 'Skickar…';
+      btn.disabled = true; btn.textContent = t('submitting');
       try {
         const r = await fetch(`${API}/votes`, {
           method: 'POST',
@@ -823,13 +1029,16 @@
         state.selected = new Set();
         renderPage(true);
       } catch {
-        err.textContent = 'Kunde inte skicka rösten.';
-        btn.disabled = false; btn.textContent = 'Skicka röst ▷';
+        err.textContent = t('errSubmit');
+        btn.disabled = false; btn.textContent = t('submitBtn');
       }
     }
 
-    /* ---------------- Manage (admin) view ---------------- */
+    /* ================================================================
+       Manage (admin) view
+    ================================================================ */
     function renderManage(data) {
+      currentView = 'manage';
       changeBtn.classList.remove('hidden');
       state.event = data.event;
       state.dates = data.dates;
@@ -842,30 +1051,29 @@
 
       app.innerHTML = `
         <div class="card">
-          <h2 class="mb">Hantera event</h2>
+          <h2 class="mb">${t('manageHead')}</h2>
           <div class="code-box">
-            <div class="lbl">Röstkod — dela denna med gästerna</div>
+            <div class="lbl">${t('voteCodeLbl')}</div>
             <div class="code">${esc(state.event.code)}</div>
-            <button class="btn sm" id="copy-code">📋 Kopiera röstkod</button>
+            <button class="btn sm" id="copy-code">${t('copyVoteBtn')}</button>
           </div>
           <div class="field mt">
-            <label>Titel</label>
+            <label>${t('labelTitle')}</label>
             <input class="text" id="title" value="${esc(state.event.title)}" />
           </div>
           <div class="field">
-            <label>Beskrivning</label>
+            <label>${t('labelDescM')}</label>
             <textarea id="description">${esc(state.event.description)}</textarea>
           </div>
           <div class="field">
-            <label>Datum</label>
+            <label>${t('labelDatesM')}</label>
             <div class="cal" id="picker-cal"></div>
           </div>
           <div class="edit-actions">
-            <button class="btn" id="save">Spara ändringar</button>
-            <button class="btn danger" id="delete">Ta bort event</button>
+            <button class="btn" id="save">${t('saveBtn')}</button>
+            <button class="btn danger" id="delete">${t('deleteBtn')}</button>
           </div>
           <div class="err" id="err"></div>
-
           <hr class="divider" />
           ${results.html}
         </div>`;
@@ -889,44 +1097,46 @@
       const dates = [...picker.selected].sort();
       const err = document.getElementById('err');
       err.textContent = '';
-      if (!title) { err.textContent = 'Titel krävs.'; return; }
-      if (dates.length === 0) { err.textContent = 'Välj minst ett datum.'; return; }
+      if (!title) { err.textContent = t('errTitleM'); return; }
+      if (dates.length === 0) { err.textContent = t('errDatesM'); return; }
 
       const btn = document.getElementById('save');
-      btn.disabled = true; btn.textContent = 'Sparar…';
+      btn.disabled = true; btn.textContent = t('saving');
       try {
         const r = await fetch(`${API}/events/${state.event.id}`, {
           method: 'PATCH',
           headers: adminHeaders(),
           body: JSON.stringify({ title, description, dates }),
         });
-        if (r.status === 401) { err.textContent = 'Behörighet saknas.'; btn.disabled = false; btn.textContent = 'Spara ändringar'; return; }
+        if (r.status === 401) { err.textContent = t('errAuth'); btn.disabled = false; btn.textContent = t('saveBtn'); return; }
         if (!r.ok) throw new Error();
-        toast('Ändringar sparade ✓');
+        toast(t('toastSaved'));
         const fresh = await (await fetch(`${API}/events/resolve/${adminCode}`)).json();
         renderManage(fresh);
       } catch {
-        err.textContent = 'Kunde inte spara.';
-        btn.disabled = false; btn.textContent = 'Spara ändringar';
+        err.textContent = t('errSave');
+        btn.disabled = false; btn.textContent = t('saveBtn');
       }
     }
 
     async function deleteManage() {
-      if (!confirm('Ta bort eventet och alla röster? Detta går inte att ångra.')) return;
+      if (!confirm(t('confirmDel'))) return;
       try {
         const r = await fetch(`${API}/events/${state.event.id}`, {
           method: 'DELETE',
           headers: { 'Authorization': 'Bearer ' + adminCode },
         });
-        if (r.status === 401) { toast('Behörighet saknas'); return; }
+        if (r.status === 401) { toast(t('toastNoAuth')); return; }
         if (!r.ok) throw new Error();
-        toast('Event borttaget');
+        toast(t('toastDeleted'));
         location.hash = '';
         renderLanding();
-      } catch { toast('Kunde inte ta bort'); }
+      } catch { toast(t('toastNoDel')); }
     }
 
-    /* ---------------- Router ---------------- */
+    /* ================================================================
+       Router
+    ================================================================ */
     async function route() {
       const raw = location.hash.replace('#', '').trim();
       if (raw.toLowerCase() === 'new') { renderCreate(); return; }
