@@ -231,15 +231,23 @@
     /* Top dates list */
     .top-dates { list-style: none; margin-bottom: 28px; }
     .top-dates li {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 0; border-top: 1px solid var(--border); font-size: 14px;
+      display: flex; flex-direction: column; gap: 5px;
+      padding: 10px 0; border-top: 1px solid var(--border); font-size: 14px;
     }
     .top-dates li:first-child { border-top: none; }
+    .top-dates .td-row { display: flex; align-items: center; gap: 10px; }
     .top-dates .td-rank { color: var(--muted); width: 18px; font-weight: 600; flex-shrink: 0; }
     .top-dates .td-name { font-weight: 600; flex: 1; }
     .top-dates .td-score { color: var(--muted); font-size: 13px; }
     .top-dates li.leader .td-name,
     .top-dates li.leader .td-score { color: var(--green); }
+    .td-bar-track { height: 6px; background: var(--bg-elev); border-radius: 3px; overflow: hidden; }
+    .td-bar-fill {
+      height: 100%; width: 0; border-radius: 3px;
+      background: var(--accent);
+      transition: width .9s cubic-bezier(.22,.61,.36,1);
+    }
+    .top-dates li.leader .td-bar-fill { background: var(--green); }
 
     /* Matrix */
     .matrix-wrap { overflow-x: auto; margin-bottom: 28px; }
@@ -1456,12 +1464,16 @@
       // Top 3 dates ranked list
       const topListItems = sortedDates.slice(0, 3).map((d, i) => {
         const count = state.tallies[d.id] || 0;
+        const pct = total ? Math.round((count / total) * 100) : 0;
         const f = fmtDate(d.date);
         const isLeader = hasRealLeader && count === max;
         return `<li class="${isLeader ? 'leader' : ''}">
-          <span class="td-rank">${i + 1}.</span>
-          <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
-          <span class="td-score">(${count}/${total})</span>
+          <div class="td-row">
+            <span class="td-rank">${i + 1}.</span>
+            <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
+            <span class="td-score">(${count}/${total})</span>
+          </div>
+          <div class="td-bar-track"><div class="td-bar-fill" data-pct="${pct}"></div></div>
         </li>`;
       }).join('');
 
@@ -1513,7 +1525,9 @@
     }
 
     function wireResults(_hiddenCount) {
-      // Matrix needs no wiring
+      requestAnimationFrame(() => {
+        document.querySelectorAll('.td-bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
+      });
     }
 
     /* ================================================================
