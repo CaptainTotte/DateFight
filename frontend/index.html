@@ -251,20 +251,26 @@
     .date-group.leader .td-bar-fill { background: var(--green); }
 
     /* Accordion date items */
-    .date-item { cursor: pointer; user-select: none; border-top: 1px solid var(--border); }
+    .date-item { cursor: pointer; user-select: none; border-top: 1px solid var(--border); border-radius: 6px; }
     .date-group .date-item:first-of-type { border-top: none; }
+    .date-item:hover { background: rgba(255,255,255,0.04); }
     .date-item-header {
       display: flex; align-items: center; gap: 10px;
       padding: 10px 0 4px; font-size: 14px;
     }
-    .date-item-header:hover .td-name { color: var(--accent); }
-    .td-chevron { margin-left: auto; color: var(--muted); font-size: 11px; transition: transform .2s; }
-    .date-item.open .td-chevron { transform: rotate(180deg); }
-    .date-item-voters {
-      display: none; padding: 2px 0 10px 0;
-      font-size: 13px; color: var(--muted); line-height: 1.8;
-    }
+    .td-name-col { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+    .voter-preview { font-size: 12px; color: var(--muted); }
+    .date-item.open .voter-preview { display: none; }
+    .td-chevron { color: var(--muted); font-size: 14px; transition: transform .2s, color .15s; flex-shrink: 0; }
+    .date-item:hover .td-chevron { color: var(--text); }
+    .date-item.open .td-chevron { transform: rotate(180deg); color: var(--text); }
+    .date-item-voters { display: none; padding: 4px 0 12px; }
     .date-item.open .date-item-voters { display: block; }
+    .name-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .name-chip {
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 3px 10px; font-size: 12px; color: var(--text);
+    }
     .bars-toggle {
       display: flex; align-items: center; justify-content: center; gap: 8px;
       width: 100%; margin-top: 12px;
@@ -273,6 +279,8 @@
       font-family: inherit; cursor: pointer; transition: border-color .15s, color .15s;
     }
     .bars-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    .bars-toggle:focus { outline: none; }
+    .bars-toggle:focus-visible { outline: 2px solid var(--accent); }
 
     .stack > * + * { margin-top: 12px; }
     .mt { margin-top: 24px; }
@@ -1489,17 +1497,24 @@
       const renderGroup = (g, isLeader) => {
         const datesHTML = g.dates.map(d => {
           const f = fmtDate(d.date);
-          const voters = state.votes
-            .filter(v => v.date_ids.includes(d.id))
-            .map(v => `${esc(v.first_name)} ${esc(v.last_name)}`).join(', ');
+          const voterList = state.votes.filter(v => v.date_ids.includes(d.id));
+          const previewNames = voterList.map(v => esc(v.first_name));
+          const preview = previewNames.length === 0 ? '' :
+            previewNames.length <= 2 ? previewNames.join(', ') :
+            `${previewNames.slice(0, 2).join(', ')} +${previewNames.length - 2}`;
+          const chipsHTML = voterList.map(v =>
+            `<span class="name-chip">${esc(v.first_name)} ${esc(v.last_name)}</span>`).join('');
           return `
             <div class="date-item">
               <div class="date-item-header">
-                <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
+                <div class="td-name-col">
+                  <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
+                  ${preview ? `<span class="voter-preview">${preview}</span>` : ''}
+                </div>
                 <span class="td-chevron">▾</span>
               </div>
               <div class="td-bar-track"><div class="td-bar-fill" data-pct="${g.pct}"></div></div>
-              <div class="date-item-voters">${voters || '—'}</div>
+              <div class="date-item-voters"><div class="name-chips">${chipsHTML || '—'}</div></div>
             </div>`;
         }).join('');
         return `
