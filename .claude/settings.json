@@ -1,7 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python3 -m py_compile backend/main.py)"
+      "Bash(python3 -m py_compile backend/main.py)",
+      "Bash(python3 -m py_compile /Users/tottelundgren/Documents/Git/PYD/backend/main.py)",
+      "Bash(python3 -c \"import fastapi, pydantic; print\\('deps ok', fastapi.__version__\\)\")",
+      "Bash(rm -f /tmp/test_df.py /tmp/test_df2.py /tmp/test_mig.py)",
+      "Bash(grep -rn \"auth/verify\\\\|/events\\\\b\\\\|samdag_admin_token\\\\|admin.html\\\\|ADMIN_PASSWORD\\\\|/pages/\" frontend/)",
+      "Bash(python3 -)",
+      "Bash(node --check /tmp/df_check.js)",
+      "Bash(git reset *)",
+      "Bash(git rm *)",
+      "Bash(grep -c \"^\\\\s*},$\\\\|^\\\\s*};\\\\s*$\" /Users/tottelundgren/Documents/Git/PYD/frontend/index.html)",
+      "Bash(python3 -c ' *)"
     ]
   }
 }
