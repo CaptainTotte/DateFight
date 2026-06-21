@@ -2,7 +2,6 @@ services:
   api:
     build: ./backend
     environment:
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
       DB_PATH: /data/samdag.db
     volumes:
       - db-data:/data

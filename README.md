@@ -1,6 +1,6 @@
 # DateFight
 
-Date-polling web app — create an event with candidate dates, share a 4-digit code, and let guests vote on which days work. Results update live with animated bars.
+Date-polling web app — anyone can create an event with candidate dates, share a 4-digit code, and let guests vote on which days work. Results update live with animated bars. No login, no admin password: the event creator gets a private admin code to edit their own event.
 
 ## Stack
 
@@ -13,51 +13,55 @@ Date-polling web app — create an event with candidate dates, share a 4-digit c
 ## Quick start
 
 ```bash
-cp .env.example .env   # set ADMIN_PASSWORD
 docker compose up -d
 # → http://localhost:3000
 ```
 
-- **Vote page:** http://localhost:3000
-- **Admin panel:** http://localhost:3000/pages/admin.html
-
-The admin password defaults to `admin123` (override with `ADMIN_PASSWORD` in `.env`).
+No configuration needed — there is no global admin password.
 
 ## How it works
 
-### Admin
+Everything lives on the root page (`index.html`); there is no separate admin page.
 
-1. Log in with the admin password.
-2. Create an event: title, optional description, and pick candidate dates using the drag-to-select calendar.
-3. A 4-digit numeric code is generated — copy and share it with guests.
-4. The event list shows code, vote count and date chips. Each event can be **edited** (change dates) or **deleted** (cascades to all votes).
+### Create an event
+
+1. On the landing page, click **"Skapa nytt event"**.
+2. Enter a title, optional description, and pick candidate dates with the drag-to-select calendar.
+3. You get two codes:
+   - **Röstkod** — a 4-digit numeric code to share with guests (voting).
+   - **Admin-kod** — a 4-char alphanumeric code (always contains a letter). Save it — it's the only way to edit or delete the event later.
+
+### One code form, two outcomes
+
+The landing page has a single code input. The backend resolves the entered code:
+
+- A numeric **voting code** → opens the vote + results view.
+- An alphanumeric **admin code** → opens the manage view (edit title/description/dates, share the voting code, see results, delete the event).
 
 ### Voting
 
-1. Guest opens the landing page and enters the 4-digit code.
-2. A single-month calendar is shown with event dates highlighted in green — click or tap to select the days that work. Browse months with ‹ ›.
-3. Enter name and submit. Results appear instantly below: animated bars per date (leading date in green), plus a list of who picked which days. Dates with 0 votes are hidden.
-4. Duplicate votes are blocked by localStorage (client) and by name deduplication (server — same first + last name per event returns 409).
+1. Enter the voting code. A single-month calendar shows event dates in green — click/tap to pick the days that work; browse months with ‹ ›.
+2. Enter your name and submit. Results appear instantly: animated bars per date (leading date in green), top 5 shown with the rest behind a toggle, plus who picked which days. Dates with 0 votes are hidden.
+3. Duplicate votes are blocked by localStorage (client) and by name deduplication (server — same first + last name per event returns 409).
 
 ## API
 
-All admin endpoints require `Authorization: Bearer <password>`.
+Edit/delete require `Authorization: Bearer <admin_code>` for that specific event.
 
-| Method  | Endpoint                 | Auth  | Body / notes |
-| ------- | ------------------------ | ----- | ------------ |
-| POST    | `/auth/verify`           | —     | `{ password }` → `{ valid }` |
-| POST    | `/events`                | admin | `{ title, description, dates[] }` → `{ id, code }` |
-| GET     | `/events`                | admin | list with vote counts and dates |
-| PATCH   | `/events/{id}`           | admin | `{ dates[] }` — replace event dates |
-| DELETE  | `/events/{id}`           | admin | cascades to votes |
-| GET     | `/events/by-code/{code}` | —     | `{ event, dates, tallies, votes }` |
-| POST    | `/votes`                 | —     | `{ event_id, first_name, last_name, date_ids[] }` |
+| Method  | Endpoint                  | Auth        | Body / notes |
+| ------- | ------------------------- | ----------- | ------------ |
+| POST    | `/events`                 | —           | `{ title, description, dates[] }` → `{ id, code, admin_code }` |
+| GET     | `/events/resolve/{code}`  | —           | `{ mode: "vote"\|"admin", event, dates, tallies, votes }` (admin_code only in admin mode) |
+| GET     | `/events/by-code/{code}`  | —           | `{ event, dates, tallies, votes }` (voting code) |
+| PATCH   | `/events/{id}`            | admin_code  | `{ title?, description?, dates? }` — updates provided fields; `dates` replaces |
+| DELETE  | `/events/{id}`            | admin_code  | cascades to votes |
+| POST    | `/votes`                  | —           | `{ event_id, first_name, last_name, date_ids[] }` |
 
 Endpoints are exposed under `/api/...` from the browser (nginx strips the prefix before proxying).
 
 ## Data model
 
-- **events** — `id` (uuid), `title`, `description`, `code` (4-digit numeric), `created_at`
+- **events** — `id` (uuid), `title`, `description`, `code` (4-digit numeric), `admin_code` (4-char alphanumeric), `created_at`
 - **event_dates** — `id`, `event_id`, `date` (`YYYY-MM-DD`)
 - **votes** — `id`, `event_id`, `first_name`, `last_name`, `voted_at`
 - **vote_dates** — `vote_id`, `date_id` (many-to-many)
@@ -75,8 +79,7 @@ backend/
   requirements.txt
   main.py              # entire API in one file
 frontend/
-  index.html           # landing + vote + results (SPA, hash routing)
-  pages/admin.html     # admin panel
+  index.html           # landing + create + vote + manage (SPA, hash routing)
   img/                 # logo assets
 ```
 
@@ -85,7 +88,7 @@ frontend/
 ```bash
 cd backend
 pip install -r requirements.txt
-ADMIN_PASSWORD=admin123 DB_PATH=./datefight.db uvicorn main:app --reload
+DB_PATH=./datefight.db uvicorn main:app --reload
 ```
 
 Then serve `frontend/` with any static file server and point `/api/` at the backend (the Docker setup handles this via nginx).
