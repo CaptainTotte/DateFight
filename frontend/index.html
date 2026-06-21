@@ -263,12 +263,18 @@
     .bars-toggle:focus { outline: none; }
     .bars-toggle:focus-visible { outline: 2px solid var(--accent); }
 
-    .landing-stats {
-      font-size: 13px; color: var(--muted);
-      margin: -8px 0 20px;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      min-height: 18px;
+    .stat-chips { display: flex; gap: 10px; justify-content: center; margin: 16px 0 20px; }
+    .stat-chip {
+      flex: 1; max-width: 150px;
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 16px; text-align: center;
     }
+    .stat-chip.active-chip { background: var(--accent-soft); border-color: var(--accent); }
+    .stat-chip.settled-chip { background: var(--green-soft); border-color: var(--green); }
+    .stat-num { font-size: 28px; font-weight: 700; line-height: 1; }
+    .active-chip .stat-num { color: var(--accent); }
+    .settled-chip .stat-num { color: var(--green); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 5px; line-height: 1.3; }
 
     .preset-row { display: flex; gap: 8px; }
     .preset-btn {
@@ -420,12 +426,12 @@
         helpStep3B:   'Staplar visar hur många som kan varje dag. Ledande datum markeras i grönt.',
         helpStep4H:   'Admin-koden är din nyckel',
         helpStep4B:   'Med admin-koden kan du redigera datum och titel, eller ta bort eventet helt.',
-        landingHead:  'Gå med eller hantera',
-        landingDesc:  'Ange din 4-teckens kod — röstkod eller admin-kod.',
+        landingHead:  'Gå med i ett fight',
+        landingDesc:  'Ange din 4-teckens fightkod.',
         statsActive:  'Aktiva Date Fights',
         statsSettled: 'Avgjorda Date Fights',
         continueBtn:  'Fortsätt →',
-        createBtn:    '+ Skapa nytt event',
+        createBtn:    '+ Starta ett nytt fight',
         helpLink:     'Behöver du hjälp?',
         errCode4:     'Koden är 4 tecken.',
         errNoEvent:   'Hittade inget event med den koden.',
@@ -512,12 +518,12 @@
         helpStep3B:   'Bars show how many people can make each day. The leading date is highlighted in green.',
         helpStep4H:   'The admin code is your key',
         helpStep4B:   'Use the admin code to edit dates and title, or delete the event entirely.',
-        landingHead:  'Join or manage an event',
-        landingDesc:  'Enter your 4-character code — voting code or admin code.',
+        landingHead:  'Join or manage a fight',
+        landingDesc:  'Enter your 4-character fight code.',
         statsActive:  'Active Date Fights',
         statsSettled: 'Date Fights Settled',
         continueBtn:  'Continue →',
-        createBtn:    '+ Create new event',
+        createBtn:    '+ Start a new fight',
         helpLink:     'Need help?',
         errCode4:     'The code is 4 characters.',
         errNoEvent:   'No event found with that code.',
@@ -604,12 +610,12 @@
         helpStep3B:   'Balken zeigen, wie viele an welchem Tag können. Das führende Datum wird grün markiert.',
         helpStep4H:   'Der Admin-Code ist dein Schlüssel',
         helpStep4B:   'Mit dem Admin-Code kannst du Daten und Titel bearbeiten oder das Event löschen.',
-        landingHead:  'Beitreten oder verwalten',
-        landingDesc:  'Gib deinen 4-stelligen Code ein — Abstimmcode oder Admin-Code.',
+        landingHead:  'An einem Fight teilnehmen',
+        landingDesc:  'Gib deinen 4-stelligen Fight-Code ein.',
         statsActive:  'Aktive Date Fights',
         statsSettled: 'Abgeschlossene Date Fights',
         continueBtn:  'Weiter →',
-        createBtn:    '+ Neues Event erstellen',
+        createBtn:    '+ Neuen Fight starten',
         helpLink:     'Brauchst du Hilfe?',
         errCode4:     'Der Code ist 4 Zeichen.',
         errNoEvent:   'Kein Event mit diesem Code gefunden.',
@@ -696,12 +702,12 @@
         helpStep3B:   'Las barras muestran cuántas personas pueden cada día. La fecha líder se destaca en verde.',
         helpStep4H:   'El código de administrador es tu llave',
         helpStep4B:   'Con el código de administrador puedes editar fechas y título, o eliminar el evento.',
-        landingHead:  'Unirse o gestionar',
-        landingDesc:  'Introduce tu código de 4 caracteres — código de votación o de administrador.',
+        landingHead:  'Únete o gestiona un fight',
+        landingDesc:  'Introduce tu código fight de 4 caracteres.',
         statsActive:  'Date Fights activos',
         statsSettled: 'Date Fights resueltos',
         continueBtn:  'Continuar →',
-        createBtn:    '+ Crear nuevo evento',
+        createBtn:    '+ Iniciar un nuevo fight',
         helpLink:     '¿Necesitas ayuda?',
         errCode4:     'El código tiene 4 caracteres.',
         errNoEvent:   'No se encontró ningún evento con ese código.',
@@ -788,12 +794,12 @@
         helpStep3B:   'Les barres montrent combien de personnes sont disponibles chaque jour. La date en tête est mise en vert.',
         helpStep4H:   'Le code admin est votre clé',
         helpStep4B:   "Avec le code admin, vous pouvez modifier les dates et le titre, ou supprimer l'événement.",
-        landingHead:  'Rejoindre ou gérer',
-        landingDesc:  'Entrez votre code à 4 caractères — code de vote ou code admin.',
+        landingHead:  'Rejoindre ou gérer un fight',
+        landingDesc:  'Entrez votre code fight à 4 caractères.',
         statsActive:  'Date Fights actifs',
         statsSettled: 'Date Fights résolus',
         continueBtn:  'Continuer →',
-        createBtn:    '+ Créer un événement',
+        createBtn:    '+ Démarrer un nouveau fight',
         helpLink:     "Besoin d'aide ?",
         errCode4:     'Le code fait 4 caractères.',
         errNoEvent:   'Aucun événement trouvé avec ce code.',
@@ -880,12 +886,12 @@
         helpStep3B:   'Le barre mostrano quante persone sono disponibili ogni giorno. La data in testa è evidenziata in verde.',
         helpStep4H:   'Il codice admin è la tua chiave',
         helpStep4B:   "Con il codice admin puoi modificare date e titolo, o eliminare l'evento.",
-        landingHead:  'Partecipa o gestisci',
-        landingDesc:  'Inserisci il tuo codice a 4 caratteri — codice di voto o codice admin.',
+        landingHead:  'Unisciti o gestisci un fight',
+        landingDesc:  'Inserisci il tuo codice fight a 4 caratteri.',
         statsActive:  'Date Fights attivi',
         statsSettled: 'Date Fights risolti',
         continueBtn:  'Continua →',
-        createBtn:    '+ Crea nuovo evento',
+        createBtn:    '+ Inizia un nuovo fight',
         helpLink:     'Hai bisogno di aiuto?',
         errCode4:     'Il codice è di 4 caratteri.',
         errNoEvent:   'Nessun evento trovato con questo codice.',
@@ -972,12 +978,12 @@
         helpStep3B:   'As barras mostram quantas pessoas estão disponíveis cada dia. A data líder é destacada a verde.',
         helpStep4H:   'O código de administrador é a sua chave',
         helpStep4B:   'Com o código de administrador pode editar datas e título, ou eliminar o evento.',
-        landingHead:  'Entrar ou gerir',
-        landingDesc:  'Introduza o seu código de 4 caracteres — código de votação ou de administrador.',
+        landingHead:  'Entrar ou gerir um fight',
+        landingDesc:  'Introduza o seu código fight de 4 caracteres.',
         statsActive:  'Date Fights ativos',
         statsSettled: 'Date Fights resolvidos',
         continueBtn:  'Continuar →',
-        createBtn:    '+ Criar novo evento',
+        createBtn:    '+ Iniciar um novo fight',
         helpLink:     'Precisa de ajuda?',
         errCode4:     'O código tem 4 caracteres.',
         errNoEvent:   'Nenhum evento encontrado com esse código.',
@@ -1194,6 +1200,15 @@
       el.textContent = msg; el.classList.add('show');
       clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 1800);
     }
+    function countUp(el, target, duration = 700) {
+      const start = Date.now();
+      const tick = () => {
+        const p = Math.min(1, (Date.now() - start) / duration);
+        el.textContent = Math.round(p * target);
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => toast(t('copied'))).catch(() => {});
     }
@@ -1208,8 +1223,8 @@
         <div class="card landing center">
           <div class="icon-badge">👥</div>
           <h2>${t('landingHead')}</h2>
-          <p class="muted" style="margin:8px 0 12px">${t('landingDesc')}</p>
-          <div class="landing-stats" id="landing-stats"></div>
+          <div class="stat-chips" id="landing-stats"></div>
+          <p class="muted" style="margin:0 0 20px">${t('landingDesc')}</p>
           <div class="field">
             <input class="code" id="code" maxlength="4" placeholder="––––" autocomplete="off" />
           </div>
@@ -1235,10 +1250,18 @@
         .then(r => r.json())
         .then(s => {
           const el = document.getElementById('landing-stats');
-          if (el) el.innerHTML =
-            `<span>${s.active} ${t('statsActive')}</span>` +
-            `<span>·</span>` +
-            `<span>${s.settled} ${t('statsSettled')}</span>`;
+          if (!el) return;
+          el.innerHTML = `
+            <div class="stat-chip active-chip">
+              <div class="stat-num" id="stat-active">0</div>
+              <div class="stat-label">${t('statsActive')}</div>
+            </div>
+            <div class="stat-chip settled-chip">
+              <div class="stat-num" id="stat-settled">0</div>
+              <div class="stat-label">${t('statsSettled')}</div>
+            </div>`;
+          countUp(document.getElementById('stat-active'), s.active);
+          countUp(document.getElementById('stat-settled'), s.settled);
         })
         .catch(() => {});
 
