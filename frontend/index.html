@@ -324,6 +324,31 @@
       opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 50;
     }
     .toast.show { opacity: 1; }
+    .help-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .help-modal {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 32px; max-width: 480px; width: 100%;
+      position: relative; max-height: 90vh; overflow-y: auto;
+    }
+    .help-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: none; color: var(--muted);
+      font-size: 18px; cursor: pointer; line-height: 1;
+    }
+    .help-close:hover { color: var(--text); }
+    .help-step { display: flex; gap: 14px; margin-bottom: 20px; text-align: left; }
+    .help-step:last-child { margin-bottom: 0; }
+    .help-num {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      background: var(--accent-soft); color: var(--accent);
+      display: grid; place-items: center; font-size: 13px; font-weight: 700;
+    }
+    .help-step-body h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .help-step-body p { font-size: 14px; color: var(--muted); line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -349,6 +374,12 @@
     <div class="footer"><span id="footer-text">© 2026 DateFight · Hitta dagen som funkar för alla</span><br><a href="https://github.com/CaptainTotte/DateFight" target="_blank" rel="noopener">GitHub</a></div>
   </div>
   <div class="toast" id="toast"></div>
+  <div id="help-overlay" class="help-overlay hidden" role="dialog" aria-modal="true">
+    <div class="help-modal">
+      <button id="help-close" class="help-close" aria-label="Stäng">✕</button>
+      <div id="help-content"></div>
+    </div>
+  </div>
 
   <script>
     /* ================================================================
@@ -365,6 +396,15 @@
         leder:        'Leder',
         langFlag:     '🇸🇪',
         langName:     'Svenska',
+        helpTitle:    'Hur funkar DateFight?',
+        helpStep1H:   'Skapa ett event',
+        helpStep1B:   'Välj datum i kalendern och ge eventet ett namn. Du får en röstkod att dela med gästerna och en admin-kod som bara du har.',
+        helpStep2H:   'Dela röstkoden',
+        helpStep2B:   'Gästerna anger den 4-siffriga röstkoden och klickar i de dagar som funkar för dem.',
+        helpStep3H:   'Se resultaten direkt',
+        helpStep3B:   'Staplar visar hur många som kan varje dag. Ledande datum markeras i grönt.',
+        helpStep4H:   'Admin-koden är din nyckel',
+        helpStep4B:   'Med admin-koden kan du redigera datum och titel, eller ta bort eventet helt.',
         landingHead:  'Gå med eller hantera',
         landingDesc:  'Ange din 4-teckens kod — röstkod eller admin-kod.',
         continueBtn:  'Fortsätt →',
@@ -441,6 +481,15 @@
         leder:        'Leading',
         langFlag:     '🇬🇧',
         langName:     'English',
+        helpTitle:    'How does DateFight work?',
+        helpStep1H:   'Create an event',
+        helpStep1B:   'Pick dates on the calendar and give the event a name. You get a vote code to share with guests and an admin code only you have.',
+        helpStep2H:   'Share the vote code',
+        helpStep2B:   'Guests enter the 4-digit vote code and tap the days that work for them.',
+        helpStep3H:   'See results instantly',
+        helpStep3B:   'Bars show how many people can make each day. The leading date is highlighted in green.',
+        helpStep4H:   'The admin code is your key',
+        helpStep4B:   'Use the admin code to edit dates and title, or delete the event entirely.',
         landingHead:  'Join or manage an event',
         landingDesc:  'Enter your 4-character code — voting code or admin code.',
         continueBtn:  'Continue →',
@@ -551,6 +600,7 @@
         event: { ...state.event, admin_code: adminCode },
         dates: state.dates, tallies: state.tallies, votes: state.votes,
       });
+      if (!helpOverlay.classList.contains('hidden')) renderHelp();
     }
 
     const langPickerEl = document.getElementById('lang-picker');
@@ -578,6 +628,30 @@
     });
 
     applyLang();
+
+    /* ================================================================
+       Help modal
+    ================================================================ */
+    const helpOverlay = document.getElementById('help-overlay');
+
+    function renderHelp() {
+      document.getElementById('help-content').innerHTML = `
+        <h2 style="margin-bottom:24px;text-align:center">${t('helpTitle')}</h2>
+        ${[1,2,3,4].map(n => `
+          <div class="help-step">
+            <div class="help-num">${n}</div>
+            <div class="help-step-body">
+              <h3>${t('helpStep'+n+'H')}</h3>
+              <p>${t('helpStep'+n+'B')}</p>
+            </div>
+          </div>`).join('')}`;
+    }
+
+    function openHelp() { renderHelp(); helpOverlay.classList.remove('hidden'); }
+
+    document.getElementById('help-close').addEventListener('click', () => helpOverlay.classList.add('hidden'));
+    helpOverlay.addEventListener('click', e => { if (e.target === helpOverlay) helpOverlay.classList.add('hidden'); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') helpOverlay.classList.add('hidden'); });
 
     changeBtn.addEventListener('click', () => {
       location.hash = '';
@@ -638,7 +712,7 @@
             <button class="link-btn" id="go-create">${t('createBtn')}</button>
           </div>
         </div>
-        <div class="help"><a href="#">${t('helpLink')}</a></div>`;
+        <div class="help"><button class="link-btn" id="help-link">${t('helpLink')}</button></div>`;
 
       const codeInput = document.getElementById('code');
       codeInput.focus();
@@ -648,6 +722,7 @@
       codeInput.addEventListener('keydown', e => { if (e.key === 'Enter') join(); });
       document.getElementById('join').addEventListener('click', join);
       document.getElementById('go-create').addEventListener('click', () => { location.hash = 'new'; });
+      document.getElementById('help-link').addEventListener('click', openHelp);
 
       async function join() {
         const code = codeInput.value.trim().toUpperCase();
