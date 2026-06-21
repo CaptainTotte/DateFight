@@ -430,3 +430,14 @@ def update_vote(body: VoteIn):
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/stats")
+def get_stats():
+    with get_db() as conn:
+        active = conn.execute(
+            "SELECT COUNT(*) FROM events WHERE closes_at IS NULL OR closes_at > ?",
+            (now_iso(),)
+        ).fetchone()[0]
+        settled = conn.execute("SELECT COUNT(*) FROM events").fetchone()[0]
+    return {"active": active, "settled": settled}

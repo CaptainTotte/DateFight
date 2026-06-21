@@ -263,6 +263,13 @@
     .bars-toggle:focus { outline: none; }
     .bars-toggle:focus-visible { outline: 2px solid var(--accent); }
 
+    .landing-stats {
+      font-size: 13px; color: var(--muted);
+      margin: -8px 0 20px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 18px;
+    }
+
     .preset-row { display: flex; gap: 8px; }
     .preset-btn {
       flex: 1; padding: 8px; font-size: 13px; font-weight: 600; font-family: inherit;
@@ -415,6 +422,8 @@
         helpStep4B:   'Med admin-koden kan du redigera datum och titel, eller ta bort eventet helt.',
         landingHead:  'Gå med eller hantera',
         landingDesc:  'Ange din 4-teckens kod — röstkod eller admin-kod.',
+        statsActive:  'Aktiva Date Fights',
+        statsSettled: 'Avgjorda Date Fights',
         continueBtn:  'Fortsätt →',
         createBtn:    '+ Skapa nytt event',
         helpLink:     'Behöver du hjälp?',
@@ -505,6 +514,8 @@
         helpStep4B:   'Use the admin code to edit dates and title, or delete the event entirely.',
         landingHead:  'Join or manage an event',
         landingDesc:  'Enter your 4-character code — voting code or admin code.',
+        statsActive:  'Active Date Fights',
+        statsSettled: 'Date Fights Settled',
         continueBtn:  'Continue →',
         createBtn:    '+ Create new event',
         helpLink:     'Need help?',
@@ -595,6 +606,8 @@
         helpStep4B:   'Mit dem Admin-Code kannst du Daten und Titel bearbeiten oder das Event löschen.',
         landingHead:  'Beitreten oder verwalten',
         landingDesc:  'Gib deinen 4-stelligen Code ein — Abstimmcode oder Admin-Code.',
+        statsActive:  'Aktive Date Fights',
+        statsSettled: 'Abgeschlossene Date Fights',
         continueBtn:  'Weiter →',
         createBtn:    '+ Neues Event erstellen',
         helpLink:     'Brauchst du Hilfe?',
@@ -685,6 +698,8 @@
         helpStep4B:   'Con el código de administrador puedes editar fechas y título, o eliminar el evento.',
         landingHead:  'Unirse o gestionar',
         landingDesc:  'Introduce tu código de 4 caracteres — código de votación o de administrador.',
+        statsActive:  'Date Fights activos',
+        statsSettled: 'Date Fights resueltos',
         continueBtn:  'Continuar →',
         createBtn:    '+ Crear nuevo evento',
         helpLink:     '¿Necesitas ayuda?',
@@ -775,6 +790,8 @@
         helpStep4B:   "Avec le code admin, vous pouvez modifier les dates et le titre, ou supprimer l'événement.",
         landingHead:  'Rejoindre ou gérer',
         landingDesc:  'Entrez votre code à 4 caractères — code de vote ou code admin.',
+        statsActive:  'Date Fights actifs',
+        statsSettled: 'Date Fights résolus',
         continueBtn:  'Continuer →',
         createBtn:    '+ Créer un événement',
         helpLink:     "Besoin d'aide ?",
@@ -865,6 +882,8 @@
         helpStep4B:   "Con il codice admin puoi modificare date e titolo, o eliminare l'evento.",
         landingHead:  'Partecipa o gestisci',
         landingDesc:  'Inserisci il tuo codice a 4 caratteri — codice di voto o codice admin.',
+        statsActive:  'Date Fights attivi',
+        statsSettled: 'Date Fights risolti',
         continueBtn:  'Continua →',
         createBtn:    '+ Crea nuovo evento',
         helpLink:     'Hai bisogno di aiuto?',
@@ -955,6 +974,8 @@
         helpStep4B:   'Com o código de administrador pode editar datas e título, ou eliminar o evento.',
         landingHead:  'Entrar ou gerir',
         landingDesc:  'Introduza o seu código de 4 caracteres — código de votação ou de administrador.',
+        statsActive:  'Date Fights ativos',
+        statsSettled: 'Date Fights resolvidos',
         continueBtn:  'Continuar →',
         createBtn:    '+ Criar novo evento',
         helpLink:     'Precisa de ajuda?',
@@ -1187,7 +1208,8 @@
         <div class="card landing center">
           <div class="icon-badge">👥</div>
           <h2>${t('landingHead')}</h2>
-          <p class="muted" style="margin:8px 0 24px">${t('landingDesc')}</p>
+          <p class="muted" style="margin:8px 0 12px">${t('landingDesc')}</p>
+          <div class="landing-stats" id="landing-stats"></div>
           <div class="field">
             <input class="code" id="code" maxlength="4" placeholder="––––" autocomplete="off" />
           </div>
@@ -1208,6 +1230,17 @@
       document.getElementById('join').addEventListener('click', join);
       document.getElementById('go-create').addEventListener('click', () => { location.hash = 'new'; });
       document.getElementById('help-link').addEventListener('click', openHelp);
+
+      fetch(`${API}/stats`)
+        .then(r => r.json())
+        .then(s => {
+          const el = document.getElementById('landing-stats');
+          if (el) el.innerHTML =
+            `<span>${s.active} ${t('statsActive')}</span>` +
+            `<span>·</span>` +
+            `<span>${s.settled} ${t('statsSettled')}</span>`;
+        })
+        .catch(() => {});
 
       async function join() {
         const code = codeInput.value.trim().toUpperCase();
