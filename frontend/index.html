@@ -243,6 +243,10 @@
 
     /* Matrix */
     .matrix-wrap { overflow-x: auto; margin-bottom: 28px; }
+    .matrix-wrap::-webkit-scrollbar { height: 6px; }
+    .matrix-wrap::-webkit-scrollbar-track { background: var(--bg-elev); border-radius: 3px; }
+    .matrix-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .matrix-wrap::-webkit-scrollbar-thumb:hover { background: var(--accent); }
     .matrix { border-collapse: collapse; width: 100%; }
     .matrix th, .matrix td {
       padding: 10px 14px; text-align: center; font-size: 13px;
@@ -1449,8 +1453,8 @@
         .filter(d => (state.tallies[d.id] || 0) > 0)
         .sort((a, b) => (state.tallies[b.id] || 0) - (state.tallies[a.id] || 0));
 
-      // Top dates ranked list
-      const topListItems = sortedDates.map((d, i) => {
+      // Top 3 dates ranked list
+      const topListItems = sortedDates.slice(0, 3).map((d, i) => {
         const count = state.tallies[d.id] || 0;
         const f = fmtDate(d.date);
         const isLeader = hasRealLeader && count === max;
