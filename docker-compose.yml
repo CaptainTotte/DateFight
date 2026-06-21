@@ -3,6 +3,8 @@ services:
     build: ./backend
     environment:
       DB_PATH: /data/samdag.db
+      DEMO_EVENT_CODE: ${DEMO_EVENT_CODE:-}
+      DEMO_ADMIN_CODE: ${DEMO_ADMIN_CODE:-}
     volumes:
       - db-data:/data
     restart: unless-stopped
