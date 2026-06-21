@@ -1528,7 +1528,7 @@
         <div class="results-title">${t('resultsTitle', total)}</div>
         <div style="margin-bottom:8px;font-weight:700;font-size:15px">${t('topDates')}</div>
         ${listHTML}`;
-      return { html, hiddenCount: hiddenDates.length };
+      return { html, hiddenCount };
     }
 
     function wireResults(hiddenCount) {
