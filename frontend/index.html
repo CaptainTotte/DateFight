@@ -228,48 +228,36 @@
     .edit-actions { display: flex; gap: 10px; margin-top: 8px; }
     .edit-actions .btn { width: auto; flex: 1; }
 
-    /* Top dates list */
-    .top-dates { list-style: none; margin-bottom: 28px; }
-    .top-dates li {
-      display: flex; flex-direction: column; gap: 5px;
-      padding: 10px 0; border-top: 1px solid var(--border); font-size: 14px;
-    }
-    .top-dates li:first-child { border-top: none; }
-    .top-dates .td-row { display: flex; align-items: center; gap: 10px; }
-    .top-dates .td-rank { color: var(--muted); width: 18px; font-weight: 600; flex-shrink: 0; }
-    .top-dates .td-name { font-weight: 600; flex: 1; }
-    .top-dates .td-score { color: var(--muted); font-size: 13px; }
-    .top-dates li.leader .td-name,
-    .top-dates li.leader .td-score { color: var(--green); }
-    .td-bar-track { height: 6px; background: var(--bg-elev); border-radius: 3px; overflow: hidden; }
+    /* Results list */
+    .top-dates { margin-bottom: 28px; }
+    .td-rank { color: var(--muted); width: 18px; font-weight: 600; flex-shrink: 0; }
+    .td-name { font-weight: 600; flex: 1; }
+    .td-score { color: var(--muted); font-size: 13px; }
+    .td-bar-track { height: 6px; background: var(--bg-elev); border-radius: 3px; overflow: hidden; margin-bottom: 2px; }
     .td-bar-fill {
       height: 100%; width: 0; border-radius: 3px;
       background: var(--accent);
       transition: width .9s cubic-bezier(.22,.61,.36,1);
     }
-    .top-dates li.leader .td-bar-fill { background: var(--green); }
 
-    /* Matrix */
-    .matrix-wrap { overflow-x: auto; margin-bottom: 28px; }
-    .matrix-wrap::-webkit-scrollbar { height: 6px; }
-    .matrix-wrap::-webkit-scrollbar-track { background: var(--bg-elev); border-radius: 3px; }
-    .matrix-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-    .matrix-wrap::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-    .matrix { border-collapse: collapse; width: 100%; }
-    .matrix th, .matrix td {
-      padding: 10px 14px; text-align: center; font-size: 13px;
-      border-bottom: 1px solid var(--border); white-space: nowrap;
+    /* Accordion date items */
+    .date-item { border-top: 1px solid var(--border); cursor: pointer; user-select: none; }
+    .date-item:first-child { border-top: none; }
+    .date-item-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0; font-size: 14px;
     }
-    .matrix th { font-weight: 600; color: var(--muted); font-size: 12px; }
-    .matrix th.leader-col { color: var(--green); }
-    .matrix td:first-child, .matrix th:first-child {
-      text-align: left; position: sticky; left: 0;
-      background: var(--bg-card); font-weight: 600; min-width: 100px;
+    .date-item-header:hover .td-name { color: var(--accent); }
+    .date-item.leader .td-name,
+    .date-item.leader .td-score { color: var(--green); }
+    .date-item.leader .td-bar-fill { background: var(--green); }
+    .td-chevron { margin-left: auto; color: var(--muted); font-size: 11px; transition: transform .2s; }
+    .date-item.open .td-chevron { transform: rotate(180deg); }
+    .date-item-voters {
+      display: none; padding: 0 0 12px 28px;
+      font-size: 13px; color: var(--muted); line-height: 1.8;
     }
-    .matrix td.avail { color: var(--green); font-size: 16px; }
-    .matrix td.na { color: var(--border); font-size: 14px; }
-    .matrix td.leader-col { background: var(--green-soft); }
-    .matrix tr:last-child td { border-bottom: none; }
+    .date-item.open .date-item-voters { display: block; }
 
     .stack > * + * { margin-top: 12px; }
     .mt { margin-top: 24px; }
@@ -1461,73 +1449,72 @@
         .filter(d => (state.tallies[d.id] || 0) > 0)
         .sort((a, b) => (state.tallies[b.id] || 0) - (state.tallies[a.id] || 0));
 
-      // Top 3 dates ranked list
-      const topListItems = sortedDates.slice(0, 3).map((d, i) => {
+      const LIMIT = 5;
+      const visibleDates = sortedDates.slice(0, LIMIT);
+      const hiddenDates  = sortedDates.slice(LIMIT);
+
+      const renderDateItem = (d, i) => {
         const count = state.tallies[d.id] || 0;
-        const pct = total ? Math.round((count / total) * 100) : 0;
-        const f = fmtDate(d.date);
+        const pct   = total ? Math.round((count / total) * 100) : 0;
+        const f     = fmtDate(d.date);
         const isLeader = hasRealLeader && count === max;
-        return `<li class="${isLeader ? 'leader' : ''}">
-          <div class="td-row">
-            <span class="td-rank">${i + 1}.</span>
-            <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
-            <span class="td-score">${count}/${total} · ${pct}%</span>
-          </div>
-          <div class="td-bar-track"><div class="td-bar-fill" data-pct="${pct}"></div></div>
-        </li>`;
-      }).join('');
-
-      const topList = sortedDates.length === 0
-        ? `<p class="muted">${t('noVotes')}</p>`
-        : `<ol class="top-dates">${topListItems}</ol>`;
-
-      // Matrix
-      let matrixHTML = '';
-      if (state.votes.length > 0 && sortedDates.length > 0) {
-        const headerCols = sortedDates.map(d => {
-          const count = state.tallies[d.id] || 0;
-          const f = fmtDate(d.date);
-          const isLeader = hasRealLeader && count === max;
-          return `<th class="${isLeader ? 'leader-col' : ''}">${f.dow}<br>${f.day} ${esc(f.mon)}</th>`;
-        }).join('');
-
-        const rows = state.votes.map(v => {
-          const picked = new Set(v.date_ids);
-          const cells = sortedDates.map(d => {
-            const count = state.tallies[d.id] || 0;
-            const isLeader = hasRealLeader && count === max;
-            const avail = picked.has(d.id);
-            return `<td class="${avail ? 'avail' : 'na'}${isLeader ? ' leader-col' : ''}">${avail ? '✓' : '✗'}</td>`;
-          }).join('');
-          return `<tr><td>${esc(v.first_name)} ${esc(v.last_name)}</td>${cells}</tr>`;
-        }).join('');
-
-        matrixHTML = `
-          <h2 class="mb" style="margin-top:24px">${t('whoWhen')}</h2>
-          <div class="matrix-wrap">
-            <table class="matrix">
-              <thead><tr><th></th>${headerCols}</tr></thead>
-              <tbody>${rows}</tbody>
-            </table>
+        const voters = state.votes
+          .filter(v => v.date_ids.includes(d.id))
+          .map(v => `${esc(v.first_name)} ${esc(v.last_name)}`)
+          .join(', ');
+        return `
+          <div class="date-item${isLeader ? ' leader' : ''}">
+            <div class="date-item-header">
+              <span class="td-rank">${i + 1}.</span>
+              <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
+              <span class="td-score">${count}/${total} · ${pct}%</span>
+              <span class="td-chevron">▾</span>
+            </div>
+            <div class="td-bar-track"><div class="td-bar-fill" data-pct="${pct}"></div></div>
+            <div class="date-item-voters">${voters || '—'}</div>
           </div>`;
-      } else if (state.votes.length === 0) {
-        matrixHTML = `
-          <h2 class="mb" style="margin-top:24px">${t('whoWhen')}</h2>
-          <p class="muted">${t('noVoters')}</p>`;
-      }
+      };
+
+      const visibleHTML = visibleDates.map((d, i) => renderDateItem(d, i)).join('');
+      const hiddenHTML  = hiddenDates.map((d, i) => renderDateItem(d, i + LIMIT)).join('');
+      const overflowBlock = hiddenDates.length > 0
+        ? `<div class="dates-overflow hidden" id="dates-overflow">${hiddenHTML}</div>
+           <button class="bars-toggle" id="dates-toggle">${t('showMore', hiddenDates.length)}</button>`
+        : '';
+
+      const listHTML = sortedDates.length === 0
+        ? `<p class="muted">${t('noVotes')}</p>`
+        : `<div class="top-dates">${visibleHTML}${overflowBlock}</div>`;
 
       const html = `
         <div class="results-title">${t('resultsTitle', total)}</div>
         <div style="margin-bottom:8px;font-weight:700;font-size:15px">${t('topDates')}</div>
-        ${topList}
-        ${matrixHTML}`;
-      return { html, hiddenCount: 0 };
+        ${listHTML}`;
+      return { html, hiddenCount: hiddenDates.length };
     }
 
-    function wireResults(_hiddenCount) {
+    function wireResults(hiddenCount) {
       requestAnimationFrame(() => {
         document.querySelectorAll('.td-bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
       });
+
+      document.querySelectorAll('.date-item-header').forEach(header => {
+        header.addEventListener('click', () => {
+          header.closest('.date-item').classList.toggle('open');
+        });
+      });
+
+      const toggle = document.getElementById('dates-toggle');
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          const overflow = document.getElementById('dates-overflow');
+          const open = overflow.classList.toggle('hidden') === false;
+          toggle.textContent = open ? t('showLess') : t('showMore', hiddenCount);
+          if (open) requestAnimationFrame(() => {
+            overflow.querySelectorAll('.td-bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
+          });
+        });
+      }
     }
 
     /* ================================================================
