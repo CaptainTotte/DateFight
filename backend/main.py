@@ -3,7 +3,7 @@ import sqlite3
 import uuid
 import random
 import string
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date, timedelta
 from contextlib import contextmanager
 
 from fastapi import FastAPI, HTTPException, Header, Depends
@@ -11,6 +11,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 DB_PATH = os.environ.get("DB_PATH", "/data/samdag.db")
+DEMO_EVENT_CODE = os.environ.get("DEMO_EVENT_CODE", "").strip().upper()
+DEMO_ADMIN_CODE = os.environ.get("DEMO_ADMIN_CODE", "").strip().upper()
 
 app = FastAPI(title="DateFight API")
 
@@ -89,9 +91,30 @@ def init_db():
             )
 
 
+def seed_demo(conn):
+    """Create the demo event if codes are configured and it doesn't exist yet."""
+    if not DEMO_EVENT_CODE or not DEMO_ADMIN_CODE:
+        return
+    if conn.execute("SELECT 1 FROM events WHERE code = ?", (DEMO_EVENT_CODE,)).fetchone():
+        return
+    event_id = str(uuid.uuid4())
+    conn.execute(
+        "INSERT INTO events (id, title, description, code, admin_code, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+        (event_id, "Demo", "", DEMO_EVENT_CODE, DEMO_ADMIN_CODE, now_iso()),
+    )
+    today = date.today()
+    for i in range(1, 15):
+        conn.execute(
+            "INSERT INTO event_dates (event_id, date) VALUES (?, ?)",
+            (event_id, (today + timedelta(days=i)).isoformat()),
+        )
+
+
 @app.on_event("startup")
 def startup():
     init_db()
+    with get_db() as conn:
+        seed_demo(conn)
 
 
 # --------------------------------------------------------------------------- #
