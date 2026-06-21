@@ -1845,7 +1845,7 @@
         const existingCloses = state.event.closes_at ? new Date(state.event.closes_at) : null;
         if (existingCloses) {
           const daysLeft = Math.round((existingCloses - new Date()) / 864e5);
-          const closest = [90, 30, 14, 7].find(d => daysLeft <= d) || 7;
+          const closest = [7, 14, 30, 90].find(d => daysLeft <= d) || 90;
           managedCloseDays = closest;
         }
         presetBtns.forEach(b => {
