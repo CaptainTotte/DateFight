@@ -109,6 +109,13 @@
     }
     .btn:hover { filter: brightness(1.08); }
     .btn:active { transform: translateY(1px); }
+    .btn-outline {
+      background: none; border: 1px solid var(--accent); color: var(--accent);
+      border-radius: 10px; padding: 7px 14px; font-size: 13px; font-weight: 600;
+      font-family: inherit; cursor: pointer; transition: background .15s;
+      white-space: nowrap;
+    }
+    .btn-outline:hover { background: var(--accent-soft); }
     .btn:disabled { opacity: .5; cursor: not-allowed; }
     .btn.sm { width: auto; padding: 9px 14px; font-size: 13px; }
     .btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
@@ -436,8 +443,10 @@
         submitting:   'Skickar…',
         legendAvail:  'Tillgängligt datum',
         legendNa:     'Inte ett alternativ',
-        alreadyVoted: '✓ Du har redan röstat på det här eventet',
-        justVoted:    '✓ Din röst är registrerad!',
+        alreadyVoted:   '✓ Du har redan röstat på det här eventet',
+        justVoted:      '✓ Din röst är registrerad!',
+        changeVoteBtn:  'Ändra din röst',
+        toastUpdated:   'Röst uppdaterad ✓',
         errNames:     'Fyll i för- och efternamn.',
         errPickDay:   'Välj minst en dag.',
         errSubmit:    'Kunde inte skicka rösten.',
@@ -519,8 +528,10 @@
         submitting:   'Submitting…',
         legendAvail:  'Available date',
         legendNa:     'Not an option',
-        alreadyVoted: '✓ You have already voted on this event',
-        justVoted:    '✓ Your vote has been registered!',
+        alreadyVoted:   '✓ You have already voted on this event',
+        justVoted:      '✓ Your vote has been registered!',
+        changeVoteBtn:  'Change your vote',
+        toastUpdated:   'Vote updated ✓',
         errNames:     'Please enter your first and last name.',
         errPickDay:   'Pick at least one day.',
         errSubmit:    'Could not submit your vote.',
@@ -602,8 +613,10 @@
         submitting:   'Wird gesendet…',
         legendAvail:  'Verfügbares Datum',
         legendNa:     'Keine Option',
-        alreadyVoted: '✓ Du hast bereits für dieses Event abgestimmt',
-        justVoted:    '✓ Deine Stimme wurde registriert!',
+        alreadyVoted:   '✓ Du hast bereits für dieses Event abgestimmt',
+        justVoted:      '✓ Deine Stimme wurde registriert!',
+        changeVoteBtn:  'Stimme ändern',
+        toastUpdated:   'Stimme aktualisiert ✓',
         errNames:     'Bitte Vor- und Nachname eingeben.',
         errPickDay:   'Wähle mindestens einen Tag.',
         errSubmit:    'Stimme konnte nicht gesendet werden.',
@@ -685,8 +698,10 @@
         submitting:   'Enviando…',
         legendAvail:  'Fecha disponible',
         legendNa:     'No es una opción',
-        alreadyVoted: '✓ Ya has votado en este evento',
-        justVoted:    '✓ ¡Tu voto ha sido registrado!',
+        alreadyVoted:   '✓ Ya has votado en este evento',
+        justVoted:      '✓ ¡Tu voto ha sido registrado!',
+        changeVoteBtn:  'Cambiar tu voto',
+        toastUpdated:   'Voto actualizado ✓',
         errNames:     'Por favor, introduce tu nombre y apellido.',
         errPickDay:   'Elige al menos un día.',
         errSubmit:    'No se pudo enviar tu voto.',
@@ -768,8 +783,10 @@
         submitting:   'Envoi…',
         legendAvail:  'Date disponible',
         legendNa:     'Pas une option',
-        alreadyVoted: '✓ Vous avez déjà voté pour cet événement',
-        justVoted:    '✓ Votre vote a été enregistré !',
+        alreadyVoted:   '✓ Vous avez déjà voté pour cet événement',
+        justVoted:      '✓ Votre vote a été enregistré !',
+        changeVoteBtn:  'Modifier votre vote',
+        toastUpdated:   'Vote mis à jour ✓',
         errNames:     'Veuillez entrer votre prénom et nom.',
         errPickDay:   'Choisissez au moins un jour.',
         errSubmit:    "Impossible d'envoyer votre vote.",
@@ -851,8 +868,10 @@
         submitting:   'Invio…',
         legendAvail:  'Data disponibile',
         legendNa:     "Non è un'opzione",
-        alreadyVoted: '✓ Hai già votato per questo evento',
-        justVoted:    '✓ Il tuo voto è stato registrato!',
+        alreadyVoted:   '✓ Hai già votato per questo evento',
+        justVoted:      '✓ Il tuo voto è stato registrato!',
+        changeVoteBtn:  'Modifica il tuo voto',
+        toastUpdated:   'Voto aggiornato ✓',
         errNames:     'Inserisci nome e cognome.',
         errPickDay:   'Scegli almeno un giorno.',
         errSubmit:    'Impossibile inviare il voto.',
@@ -934,8 +953,10 @@
         submitting:   'A enviar…',
         legendAvail:  'Data disponível',
         legendNa:     'Não é uma opção',
-        alreadyVoted: '✓ Já votou neste evento',
-        justVoted:    '✓ O seu voto foi registado!',
+        alreadyVoted:   '✓ Já votou neste evento',
+        justVoted:      '✓ O seu voto foi registado!',
+        changeVoteBtn:  'Alterar o seu voto',
+        toastUpdated:   'Voto atualizado ✓',
         errNames:     'Por favor, introduza o seu nome e apelido.',
         errPickDay:   'Escolha pelo menos um dia.',
         errSubmit:    'Não foi possível enviar o seu voto.',
@@ -1167,6 +1188,12 @@
     }
     function markVoted(code) {
       try { localStorage.setItem('voted_' + code, '1'); } catch {}
+    }
+    function saveVoter(code, firstName, lastName, dateIds) {
+      try { localStorage.setItem('voter_' + code, JSON.stringify({ firstName, lastName, dateIds })); } catch {}
+    }
+    function getVoter(code) {
+      try { return JSON.parse(localStorage.getItem('voter_' + code) || 'null'); } catch { return null; }
     }
 
     /* ================================================================
@@ -1492,21 +1519,31 @@
     /* ================================================================
        Vote + Results page
     ================================================================ */
-    function renderPage(justVoted = false, alreadyVoted = false) {
+    let editingVote = false;
+
+    function renderPage(justVoted = false, alreadyVoted = false, editing = false) {
       currentView = 'vote';
       currentJustVoted = justVoted;
       currentAlreadyVoted = alreadyVoted;
+      editingVote = editing;
       changeBtn.classList.remove('hidden');
       const results = buildResultsHTML();
+      const voter = getVoter(state.event.code);
+
+      if (editing && voter) {
+        state.selected = new Set(voter.dateIds.filter(id =>
+          state.dates.some(d => d.id === id)));
+      }
 
       app.innerHTML = `
         <div class="card">
           <h1>${esc(state.event.title)}</h1>
           ${state.event.description ? `<p class="desc">${esc(state.event.description)}</p>` : ''}
 
-          ${alreadyVoted || justVoted ? `
-          <div class="voted-confirm" style="margin-top:20px">
-            ${t('alreadyVoted')}
+          ${(alreadyVoted || justVoted) && !editing ? `
+          <div class="voted-confirm" style="margin-top:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <span>${t('alreadyVoted')}</span>
+            ${voter ? `<button class="btn-outline" id="change-vote-btn">${t('changeVoteBtn')}</button>` : ''}
           </div>` : `
           <div class="mt mb">
             <h2 style="margin-bottom:14px">${t('voteCalHead')}</h2>
@@ -1515,11 +1552,13 @@
           <div class="row mb">
             <div class="field" style="margin:0">
               <label>${t('labelFirst')}</label>
-              <input class="text" id="first" placeholder="${esc(t('firstPh'))}" autocomplete="given-name" />
+              <input class="text" id="first" placeholder="${esc(t('firstPh'))}" autocomplete="given-name"
+                value="${editing && voter ? esc(voter.firstName) : ''}" ${editing ? 'readonly' : ''} />
             </div>
             <div class="field" style="margin:0">
               <label>${t('labelLast')}</label>
-              <input class="text" id="last" placeholder="${esc(t('lastPh'))}" autocomplete="family-name" />
+              <input class="text" id="last" placeholder="${esc(t('lastPh'))}" autocomplete="family-name"
+                value="${editing && voter ? esc(voter.lastName) : ''}" ${editing ? 'readonly' : ''} />
             </div>
           </div>
           <button class="btn" id="submit">${t('submitBtn')}</button>
@@ -1530,7 +1569,11 @@
           ${results.html}
         </div>`;
 
-      if (!alreadyVoted && !justVoted) {
+      if ((alreadyVoted || justVoted) && !editing) {
+        document.getElementById('change-vote-btn')?.addEventListener('click', () => {
+          renderPage(false, false, true);
+        });
+      } else {
         document.getElementById('submit').addEventListener('click', submitVote);
         renderCalView();
       }
@@ -1547,9 +1590,10 @@
 
       const btn = document.getElementById('submit');
       btn.disabled = true; btn.textContent = t('submitting');
+      const method = editingVote ? 'PUT' : 'POST';
       try {
         const r = await fetch(`${API}/votes`, {
-          method: 'POST',
+          method,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             event_id: state.event.id,
@@ -1567,10 +1611,16 @@
         }
         if (!r.ok) throw new Error();
         markVoted(state.event.code);
+        saveVoter(state.event.code, first, last, [...state.selected]);
         const fresh = await (await fetch(`${API}/events/by-code/${state.event.code}`)).json();
         state.tallies = fresh.tallies; state.votes = fresh.votes; state.dates = fresh.dates;
         state.selected = new Set();
-        renderPage(true);
+        if (editingVote) {
+          toast(t('toastUpdated'));
+          renderPage(false, true);
+        } else {
+          renderPage(true);
+        }
       } catch {
         err.textContent = t('errSubmit');
         btn.disabled = false; btn.textContent = t('submitBtn');

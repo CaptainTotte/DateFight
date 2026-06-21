@@ -379,6 +379,41 @@ def create_vote(body: VoteIn):
     return {"id": vote_id}
 
 
+@app.put("/votes")
+def update_vote(body: VoteIn):
+    with get_db() as conn:
+        e = conn.execute(
+            "SELECT id FROM events WHERE id = ?", (body.event_id,)
+        ).fetchone()
+        if not e:
+            raise HTTPException(status_code=404, detail="Event not found")
+
+        existing = conn.execute(
+            "SELECT id FROM votes WHERE event_id = ? AND first_name = ? AND last_name = ?",
+            (body.event_id, body.first_name.strip(), body.last_name.strip()),
+        ).fetchone()
+        if not existing:
+            raise HTTPException(status_code=404, detail="Vote not found")
+
+        valid_ids = {
+            row["id"]
+            for row in conn.execute(
+                "SELECT id FROM event_dates WHERE event_id = ?", (body.event_id,)
+            ).fetchall()
+        }
+
+        vote_id = existing["id"]
+        conn.execute("DELETE FROM vote_dates WHERE vote_id = ?", (vote_id,))
+        conn.execute("UPDATE votes SET voted_at = ? WHERE id = ?", (now_iso(), vote_id))
+        for did in body.date_ids:
+            if did in valid_ids:
+                conn.execute(
+                    "INSERT INTO vote_dates (vote_id, date_id) VALUES (?, ?)",
+                    (vote_id, did),
+                )
+    return {"id": vote_id}
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
