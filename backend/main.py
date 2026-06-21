@@ -11,6 +11,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 DB_PATH = os.environ.get("DB_PATH", "/data/samdag.db")
+DEMO_EVENT_CODE = os.environ.get("DEMO_EVENT_CODE", "").strip()
+DEMO_ADMIN_CODE = os.environ.get("DEMO_ADMIN_CODE", "").strip()
 
 app = FastAPI(title="DateFight API")
 
@@ -360,3 +362,11 @@ def create_vote(body: VoteIn):
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/config")
+def get_config():
+    return {
+        "demo_event_code": DEMO_EVENT_CODE or None,
+        "demo_admin_code": DEMO_ADMIN_CODE or None,
+    }
