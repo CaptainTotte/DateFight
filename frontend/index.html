@@ -246,7 +246,7 @@
     }
     .date-group:first-child .date-group-header { border-top: none; }
     .td-rank { font-size: 15px; font-weight: 700; color: var(--text); }
-    .dg-score { font-size: 13px; color: var(--muted); }
+    .dg-score { font-size: 13px; color: var(--muted); margin-left: auto; }
     .date-group.leader .td-rank { color: var(--green); }
     .date-group.leader .td-bar-fill { background: var(--green); }
 
@@ -1469,9 +1469,8 @@
       for (const d of sortedDates) {
         const count = state.tallies[d.id] || 0;
         if (!groups.length || groups[groups.length - 1].count !== count) {
-          const rank = sortedDates.filter(x => (state.tallies[x.id] || 0) > count).length + 1;
-          const pct  = total ? Math.round((count / total) * 100) : 0;
-          groups.push({ rank, count, pct, dates: [] });
+          const pct = total ? Math.round((count / total) * 100) : 0;
+          groups.push({ rank: groups.length + 1, count, pct, dates: [] });
         }
         groups[groups.length - 1].dates.push(d);
       }
