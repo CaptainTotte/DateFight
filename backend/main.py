@@ -306,9 +306,12 @@ def update_event(event_id: str, body: UpdateEventIn, _: bool = Depends(require_e
 @app.delete("/events/{event_id}")
 def delete_event(event_id: str, _: bool = Depends(require_event_admin)):
     with get_db() as conn:
-        cur = conn.execute("DELETE FROM events WHERE id = ?", (event_id,))
-        if cur.rowcount == 0:
+        e = conn.execute("SELECT code FROM events WHERE id = ?", (event_id,)).fetchone()
+        if not e:
             raise HTTPException(status_code=404, detail="Event not found")
+        if e["code"] == "0000":
+            raise HTTPException(status_code=403, detail="Cannot delete demo event")
+        conn.execute("DELETE FROM events WHERE id = ?", (event_id,))
     return {"deleted": True}
 
 

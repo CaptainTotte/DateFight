@@ -366,6 +366,14 @@
       font-size: 18px; cursor: pointer; line-height: 1;
     }
     .help-close:hover { color: var(--text); }
+    .confirm-modal {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px 24px; max-width: 360px; width: 100%;
+    }
+    .confirm-modal p { font-size: 15px; line-height: 1.5; margin-bottom: 20px; }
+    .confirm-actions { display: flex; gap: 10px; }
+    .confirm-actions .btn { flex: 1; }
+
     .help-step { display: flex; gap: 14px; margin-bottom: 20px; text-align: left; }
     .help-step:last-child { margin-bottom: 0; }
     .help-num {
@@ -397,6 +405,15 @@
     <div class="footer"><span id="footer-text">© 2026 DateFight · Hitta dagen som funkar för alla</span><br><a href="https://github.com/CaptainTotte/DateFight" target="_blank" rel="noopener">GitHub</a></div>
   </div>
   <div class="toast" id="toast"></div>
+  <div id="confirm-overlay" class="help-overlay hidden" role="dialog" aria-modal="true">
+    <div class="confirm-modal">
+      <p id="confirm-msg"></p>
+      <div class="confirm-actions">
+        <button class="btn-outline" id="confirm-cancel"></button>
+        <button class="btn danger" id="confirm-ok"></button>
+      </div>
+    </div>
+  </div>
   <div id="help-overlay" class="help-overlay hidden" role="dialog" aria-modal="true">
     <div class="help-modal">
       <button id="help-close" class="help-close" aria-label="Stäng">✕</button>
@@ -489,13 +506,15 @@
         labelDatesM:  'Datum',
         saveBtn:      'Spara ändringar',
         saving:       'Sparar…',
-        deleteBtn:    'Ta bort event',
-        confirmDel:   'Ta bort eventet och alla röster? Detta går inte att ångra.',
-        toastSaved:   'Ändringar sparade ✓',
-        toastDeleted: 'Event borttaget',
-        toastNoAuth:  'Behörighet saknas',
-        toastNoSave:  'Kunde inte spara',
-        toastNoDel:   'Kunde inte ta bort',
+        deleteBtn:         'Ta bort fight',
+        cancelBtn:         'Avbryt',
+        confirmDel:        'Ta bort fighten och alla röster? Detta går inte att ångra.',
+        cannotDeleteDemo:  'Demo-fighten kan inte tas bort.',
+        toastSaved:        'Ändringar sparade ✓',
+        toastDeleted:      'Fight borttagen',
+        toastNoAuth:       'Behörighet saknas',
+        toastNoSave:       'Kunde inte spara',
+        toastNoDel:        'Kunde inte ta bort',
         errTitleM:    'Titel krävs.',
         errDatesM:    'Välj minst ett datum.',
         errAuth:      'Behörighet saknas.',
@@ -581,13 +600,15 @@
         labelDatesM:  'Dates',
         saveBtn:      'Save changes',
         saving:       'Saving…',
-        deleteBtn:    'Delete event',
-        confirmDel:   'Delete event and all votes? This cannot be undone.',
-        toastSaved:   'Changes saved ✓',
-        toastDeleted: 'Event deleted',
-        toastNoAuth:  'Unauthorized',
-        toastNoSave:  'Could not save',
-        toastNoDel:   'Could not delete',
+        deleteBtn:         'Delete fight',
+        cancelBtn:         'Cancel',
+        confirmDel:        'Delete this fight and all votes? This cannot be undone.',
+        cannotDeleteDemo:  'The demo fight cannot be deleted.',
+        toastSaved:        'Changes saved ✓',
+        toastDeleted:      'Fight deleted',
+        toastNoAuth:       'Unauthorized',
+        toastNoSave:       'Could not save',
+        toastNoDel:        'Could not delete',
         errTitleM:    'Title is required.',
         errDatesM:    'Pick at least one date.',
         errAuth:      'Unauthorized.',
@@ -673,11 +694,13 @@
         labelDatesM:  'Daten',
         saveBtn:      'Änderungen speichern',
         saving:       'Wird gespeichert…',
-        deleteBtn:    'Event löschen',
-        confirmDel:   'Event und alle Stimmen löschen? Dies kann nicht rückgängig gemacht werden.',
-        toastSaved:   'Änderungen gespeichert ✓',
-        toastDeleted: 'Event gelöscht',
-        toastNoAuth:  'Nicht autorisiert',
+        deleteBtn:         'Fight löschen',
+        cancelBtn:         'Abbrechen',
+        confirmDel:        'Diesen Fight und alle Stimmen löschen? Dies kann nicht rückgängig gemacht werden.',
+        cannotDeleteDemo:  'Der Demo-Fight kann nicht gelöscht werden.',
+        toastSaved:        'Änderungen gespeichert ✓',
+        toastDeleted:      'Fight gelöscht',
+        toastNoAuth:       'Nicht autorisiert',
         toastNoSave:  'Konnte nicht speichern',
         toastNoDel:   'Konnte nicht löschen',
         errTitleM:    'Titel erforderlich.',
@@ -765,9 +788,11 @@
         labelDatesM:  'Fechas',
         saveBtn:      'Guardar cambios',
         saving:       'Guardando…',
-        deleteBtn:    'Eliminar evento',
-        confirmDel:   '¿Eliminar el evento y todos los votos? Esto no se puede deshacer.',
-        toastSaved:   'Cambios guardados ✓',
+        deleteBtn:         'Eliminar fight',
+        cancelBtn:         'Cancelar',
+        confirmDel:        '¿Eliminar este fight y todos los votos? Esto no se puede deshacer.',
+        cannotDeleteDemo:  'El fight de demo no se puede eliminar.',
+        toastSaved:        'Cambios guardados ✓',
         toastDeleted: 'Evento eliminado',
         toastNoAuth:  'No autorizado',
         toastNoSave:  'No se pudo guardar',
@@ -857,12 +882,14 @@
         labelDatesM:  'Dates',
         saveBtn:      'Enregistrer les modifications',
         saving:       'Enregistrement…',
-        deleteBtn:    "Supprimer l'événement",
-        confirmDel:   "Supprimer l'événement et tous les votes ? Cette action est irréversible.",
-        toastSaved:   'Modifications enregistrées ✓',
-        toastDeleted: 'Événement supprimé',
-        toastNoAuth:  'Non autorisé',
-        toastNoSave:  'Impossible de sauvegarder',
+        deleteBtn:         'Supprimer le fight',
+        cancelBtn:         'Annuler',
+        confirmDel:        'Supprimer ce fight et tous les votes ? Cette action est irréversible.',
+        cannotDeleteDemo:  'Le fight de démonstration ne peut pas être supprimé.',
+        toastSaved:        'Modifications enregistrées ✓',
+        toastDeleted:      'Fight supprimé',
+        toastNoAuth:       'Non autorisé',
+        toastNoSave:       'Impossible de sauvegarder',
         toastNoDel:   'Impossible de supprimer',
         errTitleM:    'Le titre est obligatoire.',
         errDatesM:    'Choisissez au moins une date.',
@@ -949,12 +976,14 @@
         labelDatesM:  'Date',
         saveBtn:      'Salva modifiche',
         saving:       'Salvataggio…',
-        deleteBtn:    'Elimina evento',
-        confirmDel:   "Eliminare l'evento e tutti i voti? Questa azione è irreversibile.",
-        toastSaved:   'Modifiche salvate ✓',
-        toastDeleted: 'Evento eliminato',
-        toastNoAuth:  'Non autorizzato',
-        toastNoSave:  'Impossibile salvare',
+        deleteBtn:         'Elimina fight',
+        cancelBtn:         'Annulla',
+        confirmDel:        'Eliminare questo fight e tutti i voti? Questa azione è irreversibile.',
+        cannotDeleteDemo:  'Il fight demo non può essere eliminato.',
+        toastSaved:        'Modifiche salvate ✓',
+        toastDeleted:      'Fight eliminato',
+        toastNoAuth:       'Non autorizzato',
+        toastNoSave:       'Impossibile salvare',
         toastNoDel:   'Impossibile eliminare',
         errTitleM:    'Il titolo è obbligatorio.',
         errDatesM:    'Scegli almeno una data.',
@@ -1041,13 +1070,15 @@
         labelDatesM:  'Datas',
         saveBtn:      'Guardar alterações',
         saving:       'A guardar…',
-        deleteBtn:    'Eliminar evento',
-        confirmDel:   'Eliminar o evento e todos os votos? Esta ação é irreversível.',
-        toastSaved:   'Alterações guardadas ✓',
-        toastDeleted: 'Evento eliminado',
-        toastNoAuth:  'Não autorizado',
-        toastNoSave:  'Não foi possível guardar',
-        toastNoDel:   'Não foi possível eliminar',
+        deleteBtn:         'Eliminar fight',
+        cancelBtn:         'Cancelar',
+        confirmDel:        'Eliminar este fight e todos os votos? Esta ação é irreversível.',
+        cannotDeleteDemo:  'O fight de demonstração não pode ser eliminado.',
+        toastSaved:        'Alterações guardadas ✓',
+        toastDeleted:      'Fight eliminado',
+        toastNoAuth:       'Não autorizado',
+        toastNoSave:       'Não foi possível guardar',
+        toastNoDel:        'Não foi possível eliminar',
         errTitleM:    'O título é obrigatório.',
         errDatesM:    'Escolha pelo menos uma data.',
         errAuth:      'Não autorizado.',
@@ -1199,6 +1230,17 @@
       const el = document.getElementById('toast');
       el.textContent = msg; el.classList.add('show');
       clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 1800);
+    }
+    function showConfirm(msg, onOk) {
+      const overlay = document.getElementById('confirm-overlay');
+      document.getElementById('confirm-msg').textContent = msg;
+      document.getElementById('confirm-cancel').textContent = t('cancelBtn');
+      document.getElementById('confirm-ok').textContent = t('deleteBtn');
+      overlay.classList.remove('hidden');
+      const close = () => overlay.classList.add('hidden');
+      document.getElementById('confirm-cancel').onclick = close;
+      document.getElementById('confirm-ok').onclick = () => { close(); onOk(); };
+      overlay.onclick = e => { if (e.target === overlay) close(); };
     }
     function countUp(el, target, duration = 700) {
       const start = Date.now();
@@ -1901,19 +1943,21 @@
       }
     }
 
-    async function deleteManage() {
-      if (!confirm(t('confirmDel'))) return;
-      try {
-        const r = await fetch(`${API}/events/${state.event.id}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': 'Bearer ' + adminCode },
-        });
-        if (r.status === 401) { toast(t('toastNoAuth')); return; }
-        if (!r.ok) throw new Error();
-        toast(t('toastDeleted'));
-        location.hash = '';
-        renderLanding();
-      } catch { toast(t('toastNoDel')); }
+    function deleteManage() {
+      showConfirm(t('confirmDel'), async () => {
+        try {
+          const r = await fetch(`${API}/events/${state.event.id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + adminCode },
+          });
+          if (r.status === 401) { toast(t('toastNoAuth')); return; }
+          if (r.status === 403) { toast(t('cannotDeleteDemo')); return; }
+          if (!r.ok) throw new Error();
+          toast(t('toastDeleted'));
+          location.hash = '';
+          renderLanding();
+        } catch { toast(t('toastNoDel')); }
+      });
     }
 
     /* ================================================================
