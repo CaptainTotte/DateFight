@@ -81,7 +81,7 @@
       font-family: inherit;
       transition: border-color .15s, box-shadow .15s;
     }
-    textarea { resize: vertical; min-height: 70px; }
+    textarea { resize: none; min-height: 70px; overflow: hidden; }
     input.text:focus, input.code:focus, textarea:focus {
       outline: none;
       border-color: var(--accent);
@@ -365,6 +365,17 @@
     function ymd(d) {
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     }
+    function autoExpand(el) {
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
+    }
+    function wireTextareas(root) {
+      (root || document).querySelectorAll('textarea').forEach(ta => {
+        ta.addEventListener('input', () => autoExpand(ta));
+        autoExpand(ta);
+      });
+    }
+
     function toast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg; t.classList.add('show');
@@ -449,6 +460,7 @@
         </div>`;
       initPicker([]);
       renderPicker();
+      wireTextareas(app);
       document.getElementById('create').addEventListener('click', createEvent);
     }
 
@@ -860,6 +872,7 @@
 
       initPicker(state.dates.map(d => d.date));
       renderPicker();
+      wireTextareas(app);
       document.getElementById('copy-code').addEventListener('click', () => copyToClipboard(state.event.code));
       document.getElementById('save').addEventListener('click', saveManage);
       document.getElementById('delete').addEventListener('click', deleteManage);
