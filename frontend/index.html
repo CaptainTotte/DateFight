@@ -1317,10 +1317,10 @@
           <div class="field">
             <label>${t('labelClosesAt')}</label>
             <div class="preset-row" id="close-presets">
-              <button class="preset-btn active" data-days="0">${t('noDeadline')}</button>
-              <button class="preset-btn" data-days="7">1w</button>
+              <button class="preset-btn active" data-days="7">1w</button>
               <button class="preset-btn" data-days="14">2w</button>
-              <button class="preset-btn" data-days="28">4w</button>
+              <button class="preset-btn" data-days="30">1m</button>
+              <button class="preset-btn" data-days="90">3m</button>
             </div>
           </div>
           <button class="btn" id="create">${t('createSubmit')}</button>
@@ -1331,7 +1331,7 @@
       renderPicker();
       wireTextareas(app);
 
-      let selectedCloseDays = 0;
+      let selectedCloseDays = 7;
       document.getElementById('close-presets').addEventListener('click', e => {
         const btn = e.target.closest('.preset-btn');
         if (!btn) return;
@@ -1818,10 +1818,10 @@
           <div class="field">
             <label>${t('labelClosesAt')}</label>
             <div class="preset-row" id="close-presets">
-              <button class="preset-btn" data-days="0">${t('noDeadline')}</button>
               <button class="preset-btn" data-days="7">1w</button>
               <button class="preset-btn" data-days="14">2w</button>
-              <button class="preset-btn" data-days="28">4w</button>
+              <button class="preset-btn" data-days="30">1m</button>
+              <button class="preset-btn" data-days="90">3m</button>
             </div>
           </div>
           <div class="edit-actions">
@@ -1839,13 +1839,13 @@
       document.getElementById('copy-code').addEventListener('click', () => copyToClipboard(state.event.code));
 
       // Pre-select the closest deadline preset (or no-deadline if none)
-      let managedCloseDays = 0;
+      let managedCloseDays = 7;
       {
         const presetBtns = document.querySelectorAll('#close-presets .preset-btn');
         const existingCloses = state.event.closes_at ? new Date(state.event.closes_at) : null;
         if (existingCloses) {
           const daysLeft = Math.round((existingCloses - new Date()) / 864e5);
-          const closest = [28, 14, 7].find(d => daysLeft <= d) || 7;
+          const closest = [90, 30, 14, 7].find(d => daysLeft <= d) || 7;
           managedCloseDays = closest;
         }
         presetBtns.forEach(b => {
