@@ -430,9 +430,6 @@
         errDatesM:    'Välj minst ett datum.',
         errAuth:      'Behörighet saknas.',
         errSave:      'Kunde inte spara.',
-        demoLabel:    '— eller testa demo —',
-        demoUserBtn:  'Prova som röstare',
-        demoAdminBtn: 'Prova som admin',
         backBtn:      '← Till start',
         footer:       '© 2026 DateFight · Hitta dagen som funkar för alla',
       },
@@ -509,9 +506,6 @@
         errDatesM:    'Pick at least one date.',
         errAuth:      'Unauthorized.',
         errSave:      'Could not save.',
-        demoLabel:    '— or try the demo —',
-        demoUserBtn:  'Try as voter',
-        demoAdminBtn: 'Try as admin',
         backBtn:      '← Back to start',
         footer:       '© 2026 DateFight · Find the day that works for everyone',
       },
@@ -627,22 +621,9 @@
     /* ================================================================
        Landing
     ================================================================ */
-    async function renderLanding() {
+    function renderLanding() {
       currentView = 'landing';
       changeBtn.classList.add('hidden');
-
-      let cfg = { demo_event_code: null, demo_admin_code: null };
-      try { cfg = await (await fetch(`${API}/config`)).json(); } catch {}
-
-      const demoSection = (cfg.demo_event_code || cfg.demo_admin_code) ? `
-        <div style="margin-top:28px">
-          <div class="muted" style="font-size:12px;margin-bottom:10px">${t('demoLabel')}</div>
-          <div class="row">
-            ${cfg.demo_event_code ? `<button class="btn ghost sm" id="demo-user">${t('demoUserBtn')}</button>` : ''}
-            ${cfg.demo_admin_code ? `<button class="btn ghost sm" id="demo-admin">${t('demoAdminBtn')}</button>` : ''}
-          </div>
-        </div>` : '';
-
       app.innerHTML = `
         <div class="card landing center">
           <div class="icon-badge">👥</div>
@@ -656,7 +637,6 @@
           <div style="margin-top:20px">
             <button class="link-btn" id="go-create">${t('createBtn')}</button>
           </div>
-          ${demoSection}
         </div>
         <div class="help"><a href="#">${t('helpLink')}</a></div>`;
 
@@ -668,8 +648,6 @@
       codeInput.addEventListener('keydown', e => { if (e.key === 'Enter') join(); });
       document.getElementById('join').addEventListener('click', join);
       document.getElementById('go-create').addEventListener('click', () => { location.hash = 'new'; });
-      if (cfg.demo_event_code) document.getElementById('demo-user').addEventListener('click', () => { location.hash = '#' + cfg.demo_event_code; });
-      if (cfg.demo_admin_code) document.getElementById('demo-admin').addEventListener('click', () => { location.hash = '#' + cfg.demo_admin_code; });
 
       async function join() {
         const code = codeInput.value.trim().toUpperCase();
