@@ -11,8 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 DB_PATH = os.environ.get("DB_PATH", "/data/samdag.db")
-DEMO_EVENT_CODE = os.environ.get("DEMO_EVENT_CODE", "").strip().upper()
-DEMO_ADMIN_CODE = os.environ.get("DEMO_ADMIN_CODE", "").strip().upper()
+DEMO = os.environ.get("DEMO", "").strip().lower() == "true"
 
 app = FastAPI(title="DateFight API")
 
@@ -92,15 +91,15 @@ def init_db():
 
 
 def seed_demo(conn):
-    """Create the demo event if codes are configured and it doesn't exist yet."""
-    if not DEMO_EVENT_CODE or not DEMO_ADMIN_CODE:
+    """Create the demo event on startup when DEMO=true, if it doesn't exist yet."""
+    if not DEMO:
         return
-    if conn.execute("SELECT 1 FROM events WHERE code = ?", (DEMO_EVENT_CODE,)).fetchone():
+    if conn.execute("SELECT 1 FROM events WHERE code = ?", ("0000",)).fetchone():
         return
     event_id = str(uuid.uuid4())
     conn.execute(
         "INSERT INTO events (id, title, description, code, admin_code, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-        (event_id, "Demo", "", DEMO_EVENT_CODE, DEMO_ADMIN_CODE, now_iso()),
+        (event_id, "Demo", "", "0000", "DEMO", now_iso()),
     )
     today = date.today()
     for i in range(1, 15):
