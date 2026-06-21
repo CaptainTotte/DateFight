@@ -232,38 +232,25 @@
     .top-dates { margin-bottom: 28px; }
 
     /* Score groups */
-    .date-group { margin-bottom: 4px; }
-    .date-group-header {
-      display: flex; align-items: baseline; gap: 8px;
-      padding: 10px 0 5px; border-top: 1px solid var(--border);
-    }
-    .date-group:first-child .date-group-header { border-top: none; }
-    .td-rank { font-size: 15px; font-weight: 700; color: var(--text); }
-    .dg-score { font-size: 13px; color: var(--muted); margin-left: auto; }
-    .date-group.leader .td-rank { color: var(--green); }
     .date-group.leader .td-bar-fill { background: var(--green); }
+    .date-group:not(:first-child) { margin-top: 8px; border-top: 1px solid var(--border); padding-top: 4px; }
 
-    /* Date items (static, no accordion) */
-    .date-item { border-top: 1px solid var(--border); padding: 8px 0; }
-    .date-group .date-item:first-of-type { border-top: none; }
-    .td-name { font-weight: 600; font-size: 14px; display: block; margin-bottom: 5px; }
+    /* Date items */
+    .date-item { border-top: none; padding: 8px 0; }
+    .date-group .date-item + .date-item { border-top: 1px solid var(--border); }
+    .date-item-head { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .medal { font-size: 16px; line-height: 1; }
+    .td-name { font-weight: 600; font-size: 14px; flex: 1; }
+    .td-score-inline { font-size: 13px; color: var(--muted); }
     .name-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 7px; }
     .name-chip { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: 12px; color: var(--text); }
 
-    /* Bar with text overlay */
-    .td-bar-track {
-      height: 22px; background: var(--bg-elev); border-radius: 5px; overflow: hidden;
-      position: relative; display: flex; align-items: center; justify-content: center;
-    }
+    /* Bar */
+    .td-bar-track { height: 10px; background: var(--bg-elev); border-radius: 5px; overflow: hidden; }
     .td-bar-fill {
-      position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 5px;
+      height: 100%; width: 0; border-radius: 5px;
       background: var(--accent);
       transition: width .9s cubic-bezier(.22,.61,.36,1);
-    }
-    .bar-label {
-      position: relative; z-index: 1;
-      font-size: 11px; font-weight: 600;
-      color: #000; pointer-events: none;
     }
     .bars-toggle {
       display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -1489,6 +1476,7 @@
       const hiddenCount   = hiddenGroups.reduce((n, g) => n + g.dates.length, 0);
 
       const renderGroup = (g, isLeader) => {
+        const medal = g.rank === 1 ? '🥇' : g.rank === 2 ? '🥈' : g.rank === 3 ? '🥉' : '';
         const datesHTML = g.dates.map(d => {
           const f = fmtDate(d.date);
           const chipsHTML = state.votes
@@ -1497,22 +1485,16 @@
             .join('');
           return `
             <div class="date-item">
-              <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
-              ${chipsHTML ? `<div class="name-chips">${chipsHTML}</div>` : ''}
-              <div class="td-bar-track">
-                <div class="td-bar-fill" data-pct="${g.pct}"></div>
-                <span class="bar-label">${g.count}/${total} · ${g.pct}%</span>
+              <div class="date-item-head">
+                ${medal ? `<span class="medal">${medal}</span>` : ''}
+                <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
+                <span class="td-score-inline">${g.count}/${total} · ${g.pct}%</span>
               </div>
+              ${chipsHTML ? `<div class="name-chips">${chipsHTML}</div>` : ''}
+              <div class="td-bar-track"><div class="td-bar-fill" data-pct="${g.pct}"></div></div>
             </div>`;
         }).join('');
-        return `
-          <div class="date-group${isLeader ? ' leader' : ''}">
-            <div class="date-group-header">
-              <span class="td-rank">${g.rank}.</span>
-              <span class="dg-score">${g.count}/${total} · ${g.pct}%</span>
-            </div>
-            ${datesHTML}
-          </div>`;
+        return `<div class="date-group${isLeader ? ' leader' : ''}">${datesHTML}</div>`;
       };
 
       const visibleHTML = visibleGroups.map((g, i) => renderGroup(g, hasRealLeader && i === 0)).join('');
