@@ -405,8 +405,6 @@ def update_vote(body: VoteIn):
             "SELECT id FROM votes WHERE event_id = ? AND first_name = ? AND last_name = ?",
             (body.event_id, body.first_name.strip(), body.last_name.strip()),
         ).fetchone()
-        if not existing:
-            raise HTTPException(status_code=404, detail="Vote not found")
 
         valid_ids = {
             row["id"]
@@ -415,9 +413,17 @@ def update_vote(body: VoteIn):
             ).fetchall()
         }
 
-        vote_id = existing["id"]
-        conn.execute("DELETE FROM vote_dates WHERE vote_id = ?", (vote_id,))
-        conn.execute("UPDATE votes SET voted_at = ? WHERE id = ?", (now_iso(), vote_id))
+        if existing:
+            vote_id = existing["id"]
+            conn.execute("DELETE FROM vote_dates WHERE vote_id = ?", (vote_id,))
+            conn.execute("UPDATE votes SET voted_at = ? WHERE id = ?", (now_iso(), vote_id))
+        else:
+            cur = conn.execute(
+                "INSERT INTO votes (event_id, first_name, last_name, voted_at) VALUES (?, ?, ?, ?)",
+                (body.event_id, body.first_name.strip(), body.last_name.strip(), now_iso()),
+            )
+            vote_id = cur.lastrowid
+
         for did in body.date_ids:
             if did in valid_ids:
                 conn.execute(
