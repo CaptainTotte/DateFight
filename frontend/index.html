@@ -228,46 +228,36 @@
     .edit-actions { display: flex; gap: 10px; margin-top: 8px; }
     .edit-actions .btn { width: auto; flex: 1; }
 
-    /* Results bars */
-    .bar-row { margin-bottom: 10px; }
-    .bar-head {
-      display: flex; justify-content: space-between; align-items: baseline;
-      margin-bottom: 2px; font-size: 14px;
+    /* Top dates list */
+    .top-dates { list-style: none; margin-bottom: 28px; }
+    .top-dates li {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-top: 1px solid var(--border); font-size: 14px;
     }
-    .bar-head .lbl { font-weight: 600; }
-    .bar-head .cnt { color: var(--muted); font-size: 13px; }
-    .bar-track { height: 22px; background: var(--bg-elev); border-radius: 8px; overflow: hidden; }
-    .bar-fill {
-      height: 100%; width: 0;
-      background: var(--accent);
-      border-radius: 8px;
-      transition: width .9s cubic-bezier(.22,.61,.36,1);
-      display: flex; align-items: center; padding-left: 12px;
-      font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap;
-    }
-    .bar-row.leader .bar-fill { background: var(--green); }
-    .bar-row.leader .lbl::after {
-      content: attr(data-leader-label); margin-left: 8px; font-size: 11px;
-      color: var(--green); background: var(--green-soft);
-      padding: 2px 8px; border-radius: 20px; font-weight: 600;
-    }
+    .top-dates li:first-child { border-top: none; }
+    .top-dates .td-rank { color: var(--muted); width: 18px; font-weight: 600; flex-shrink: 0; }
+    .top-dates .td-name { font-weight: 600; flex: 1; }
+    .top-dates .td-score { color: var(--muted); font-size: 13px; }
+    .top-dates li.leader .td-name,
+    .top-dates li.leader .td-score { color: var(--green); }
 
-    .bars-toggle {
-      background: none; border: 1px solid var(--border); color: var(--muted);
-      border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 500;
-      font-family: inherit; cursor: pointer; margin-top: 8px; width: 100%;
-      transition: border-color .15s, color .15s;
+    /* Matrix */
+    .matrix-wrap { overflow-x: auto; margin-bottom: 28px; }
+    .matrix { border-collapse: collapse; width: 100%; }
+    .matrix th, .matrix td {
+      padding: 10px 14px; text-align: center; font-size: 13px;
+      border-bottom: 1px solid var(--border); white-space: nowrap;
     }
-    .bars-toggle:hover { border-color: var(--accent); color: var(--accent); }
-
-    .voters { margin-top: 28px; }
-    .voter { padding: 14px 0; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
-    .voter .vname { font-weight: 600; }
-    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .chip.picked {
-      font-size: 12px; padding: 4px 10px; border-radius: 20px;
-      background: var(--accent-soft); border: 1px solid var(--accent); color: var(--text);
+    .matrix th { font-weight: 600; color: var(--muted); font-size: 12px; }
+    .matrix th.leader-col { color: var(--green); }
+    .matrix td:first-child, .matrix th:first-child {
+      text-align: left; position: sticky; left: 0;
+      background: var(--bg-card); font-weight: 600; min-width: 100px;
     }
+    .matrix td.avail { color: var(--green); font-size: 16px; }
+    .matrix td.na { color: var(--border); font-size: 14px; }
+    .matrix td.leader-col { background: var(--green-soft); }
+    .matrix tr:last-child td { border-bottom: none; }
 
     .stack > * + * { margin-top: 12px; }
     .mt { margin-top: 24px; }
@@ -455,6 +445,7 @@
         noVotes:      'Inga röster än.',
         whoWhen:      'Vem kan när?',
         noVoters:     'Ingen har röstat än.',
+        topDates:     'Toppdatum',
         noDates:      'Valde inga datum',
         showMore:     (n) => `Visa ${n} datum till ▾`,
         showLess:     'Dölj ▴',
@@ -540,6 +531,7 @@
         noVotes:      'No votes yet.',
         whoWhen:      'Who can when?',
         noVoters:     'No one has voted yet.',
+        topDates:     'Top dates',
         noDates:      'Chose no dates',
         showMore:     (n) => `Show ${n} more ▾`,
         showLess:     'Show less ▴',
@@ -625,6 +617,7 @@
         noVotes:      'Noch keine Stimmen.',
         whoWhen:      'Wer kann wann?',
         noVoters:     'Noch niemand hat abgestimmt.',
+        topDates:     'Beste Termine',
         noDates:      'Keine Daten ausgewählt',
         showMore:     (n) => `${n} weitere anzeigen ▾`,
         showLess:     'Weniger anzeigen ▴',
@@ -710,6 +703,7 @@
         noVotes:      'Aún no hay votos.',
         whoWhen:      '¿Quién puede cuándo?',
         noVoters:     'Nadie ha votado todavía.',
+        topDates:     'Mejores fechas',
         noDates:      'No eligió fechas',
         showMore:     (n) => `Mostrar ${n} más ▾`,
         showLess:     'Mostrar menos ▴',
@@ -795,6 +789,7 @@
         noVotes:      'Pas encore de votes.',
         whoWhen:      'Qui peut quand ?',
         noVoters:     "Personne n'a encore voté.",
+        topDates:     'Meilleures dates',
         noDates:      'Aucune date choisie',
         showMore:     (n) => `Afficher ${n} de plus ▾`,
         showLess:     'Afficher moins ▴',
@@ -880,6 +875,7 @@
         noVotes:      'Ancora nessun voto.',
         whoWhen:      'Chi può quando?',
         noVoters:     'Nessuno ha ancora votato.',
+        topDates:     'Date migliori',
         noDates:      'Nessuna data scelta',
         showMore:     (n) => `Mostra altri ${n} ▾`,
         showLess:     'Mostra meno ▴',
@@ -965,6 +961,7 @@
         noVotes:      'Ainda não há votos.',
         whoWhen:      'Quem pode quando?',
         noVoters:     'Ainda ninguém votou.',
+        topDates:     'Melhores datas',
         noDates:      'Não escolheu datas',
         showMore:     (n) => `Mostrar mais ${n} ▾`,
         showLess:     'Mostrar menos ▴',
@@ -1446,74 +1443,73 @@
     function buildResultsHTML() {
       const total = state.votes.length;
       const max = Math.max(0, ...Object.values(state.tallies));
-      const uniqueCounts = new Set(Object.values(state.tallies).filter(c => c > 0));
-      const hasRealLeader = uniqueCounts.size > 1;
+      const hasRealLeader = new Set(Object.values(state.tallies).filter(c => c > 0)).size > 1;
 
-      const BARS_LIMIT = 5;
-      const sortedDates = [...state.dates].sort((a, b) => (state.tallies[b.id] || 0) - (state.tallies[a.id] || 0));
-      const barItems = sortedDates.map(d => {
+      const sortedDates = [...state.dates]
+        .filter(d => (state.tallies[d.id] || 0) > 0)
+        .sort((a, b) => (state.tallies[b.id] || 0) - (state.tallies[a.id] || 0));
+
+      // Top dates ranked list
+      const topListItems = sortedDates.map((d, i) => {
         const count = state.tallies[d.id] || 0;
-        if (count === 0) return '';
-        const pct = total ? Math.round((count / total) * 100) : 0;
-        const leader = hasRealLeader && count === max;
         const f = fmtDate(d.date);
-        return `
-          <div class="bar-row ${leader ? 'leader' : ''}">
-            <div class="bar-head">
-              <span class="lbl" ${leader ? `data-leader-label="${esc(t('leder'))}"` : ''}>${f.dow} ${f.day} ${esc(f.mon)}</span>
-              <span class="cnt">${t('votesPct', count, pct)}</span>
-            </div>
-            <div class="bar-track"><div class="bar-fill" data-pct="${pct}">${pct > 12 ? pct + '%' : ''}</div></div>
-          </div>`;
-      }).filter(Boolean);
-      const hiddenCount = Math.max(0, barItems.length - BARS_LIMIT);
-      const bars = barItems.length === 0 ? '' :
-        barItems.slice(0, BARS_LIMIT).join('') +
-        (hiddenCount > 0 ? `<div class="bars-overflow hidden" id="bars-overflow">${barItems.slice(BARS_LIMIT).join('')}</div>
-          <button class="bars-toggle" id="bars-toggle">${t('showMore', hiddenCount)}</button>` : '');
-
-      const voters = state.votes.map(v => {
-        const picked = new Set(v.date_ids);
-        const pickedDates = state.dates.filter(d => picked.has(d.id));
-        const chips = pickedDates.map(d => {
-          const f = fmtDate(d.date);
-          return `<span class="chip picked">${f.dow} ${f.day} ${esc(f.mon)}</span>`;
-        }).join('');
-        const label = pickedDates.length === 0
-          ? `<span class="muted" style="font-size:13px">${t('noDates')}</span>`
-          : chips;
-        return `
-          <div class="voter">
-            <span class="vname">${esc(v.first_name)} ${esc(v.last_name)}</span>
-            <div class="chips">${label}</div>
-          </div>`;
+        const isLeader = hasRealLeader && count === max;
+        return `<li class="${isLeader ? 'leader' : ''}">
+          <span class="td-rank">${i + 1}.</span>
+          <span class="td-name">${f.dow} ${f.day} ${esc(f.mon)}</span>
+          <span class="td-score">(${count}/${total})</span>
+        </li>`;
       }).join('');
+
+      const topList = sortedDates.length === 0
+        ? `<p class="muted">${t('noVotes')}</p>`
+        : `<ol class="top-dates">${topListItems}</ol>`;
+
+      // Matrix
+      let matrixHTML = '';
+      if (state.votes.length > 0 && sortedDates.length > 0) {
+        const headerCols = sortedDates.map(d => {
+          const count = state.tallies[d.id] || 0;
+          const f = fmtDate(d.date);
+          const isLeader = hasRealLeader && count === max;
+          return `<th class="${isLeader ? 'leader-col' : ''}">${f.dow}<br>${f.day} ${esc(f.mon)}</th>`;
+        }).join('');
+
+        const rows = state.votes.map(v => {
+          const picked = new Set(v.date_ids);
+          const cells = sortedDates.map(d => {
+            const count = state.tallies[d.id] || 0;
+            const isLeader = hasRealLeader && count === max;
+            const avail = picked.has(d.id);
+            return `<td class="${avail ? 'avail' : 'na'}${isLeader ? ' leader-col' : ''}">${avail ? '✓' : '✗'}</td>`;
+          }).join('');
+          return `<tr><td>${esc(v.first_name)} ${esc(v.last_name)}</td>${cells}</tr>`;
+        }).join('');
+
+        matrixHTML = `
+          <h2 class="mb" style="margin-top:24px">${t('whoWhen')}</h2>
+          <div class="matrix-wrap">
+            <table class="matrix">
+              <thead><tr><th></th>${headerCols}</tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>`;
+      } else if (state.votes.length === 0) {
+        matrixHTML = `
+          <h2 class="mb" style="margin-top:24px">${t('whoWhen')}</h2>
+          <p class="muted">${t('noVoters')}</p>`;
+      }
 
       const html = `
         <div class="results-title">${t('resultsTitle', total)}</div>
-        <div id="bars">${bars || `<p class="muted">${t('noVotes')}</p>`}</div>
-        <div class="voters">
-          <h2 class="mb" style="margin-top:24px">${t('whoWhen')}</h2>
-          ${voters || `<p class="muted">${t('noVoters')}</p>`}
-        </div>`;
-      return { html, hiddenCount };
+        <div style="margin-bottom:8px;font-weight:700;font-size:15px">${t('topDates')}</div>
+        ${topList}
+        ${matrixHTML}`;
+      return { html, hiddenCount: 0 };
     }
 
-    function wireResults(hiddenCount) {
-      const barsToggle = document.getElementById('bars-toggle');
-      if (barsToggle) {
-        barsToggle.addEventListener('click', () => {
-          const overflow = document.getElementById('bars-overflow');
-          const open = overflow.classList.toggle('hidden') === false;
-          barsToggle.textContent = open ? t('showLess') : t('showMore', hiddenCount);
-          if (open) requestAnimationFrame(() => {
-            overflow.querySelectorAll('.bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
-          });
-        });
-      }
-      requestAnimationFrame(() => {
-        app.querySelectorAll('.bar-fill:not(#bars-overflow .bar-fill)').forEach(b => { b.style.width = b.dataset.pct + '%'; });
-      });
+    function wireResults(_hiddenCount) {
+      // Matrix needs no wiring
     }
 
     /* ================================================================
