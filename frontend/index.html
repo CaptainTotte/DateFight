@@ -263,6 +263,18 @@
     .bars-toggle:focus { outline: none; }
     .bars-toggle:focus-visible { outline: 2px solid var(--accent); }
 
+    .preset-row { display: flex; gap: 8px; }
+    .preset-btn {
+      flex: 1; padding: 8px; font-size: 13px; font-weight: 600; font-family: inherit;
+      background: var(--bg-elev); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--muted); cursor: pointer; transition: background .15s, border-color .15s, color .15s;
+    }
+    .preset-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .closes-badge {
+      display: inline-block; font-size: 12px; color: var(--muted);
+      margin-top: 4px;
+    }
+
     .stack > * + * { margin-top: 12px; }
     .mt { margin-top: 24px; }
     .mb { margin-bottom: 24px; }
@@ -453,6 +465,10 @@
         noDates:      'Valde inga datum',
         showMore:     (n) => `Visa ${n} datum till ▾`,
         showLess:     'Dölj ▴',
+        labelClosesAt: 'Röstningen stänger',
+        noDeadline:   'Ingen deadline',
+        votingClosed: 'Röstningen är stängd',
+        closesOn:     'Stänger',
         manageHead:   'Hantera event',
         labelDescM:   'Beskrivning',
         labelDatesM:  'Datum',
@@ -539,6 +555,10 @@
         noDates:      'Chose no dates',
         showMore:     (n) => `Show ${n} more ▾`,
         showLess:     'Show less ▴',
+        labelClosesAt: 'Voting closes',
+        noDeadline:   'No deadline',
+        votingClosed: 'Voting is closed',
+        closesOn:     'Closes',
         manageHead:   'Manage event',
         labelDescM:   'Description',
         labelDatesM:  'Dates',
@@ -625,6 +645,10 @@
         noDates:      'Keine Daten ausgewählt',
         showMore:     (n) => `${n} weitere anzeigen ▾`,
         showLess:     'Weniger anzeigen ▴',
+        labelClosesAt: 'Abstimmung endet',
+        noDeadline:   'Kein Ablaufdatum',
+        votingClosed: 'Abstimmung geschlossen',
+        closesOn:     'Endet',
         manageHead:   'Event verwalten',
         labelDescM:   'Beschreibung',
         labelDatesM:  'Daten',
@@ -711,6 +735,10 @@
         noDates:      'No eligió fechas',
         showMore:     (n) => `Mostrar ${n} más ▾`,
         showLess:     'Mostrar menos ▴',
+        labelClosesAt: 'Cierre de votación',
+        noDeadline:   'Sin límite',
+        votingClosed: 'Votación cerrada',
+        closesOn:     'Cierra',
         manageHead:   'Gestionar evento',
         labelDescM:   'Descripción',
         labelDatesM:  'Fechas',
@@ -797,6 +825,10 @@
         noDates:      'Aucune date choisie',
         showMore:     (n) => `Afficher ${n} de plus ▾`,
         showLess:     'Afficher moins ▴',
+        labelClosesAt: 'Clôture du vote',
+        noDeadline:   'Sans limite',
+        votingClosed: 'Vote clôturé',
+        closesOn:     'Clôture',
         manageHead:   "Gérer l'événement",
         labelDescM:   'Description',
         labelDatesM:  'Dates',
@@ -883,6 +915,10 @@
         noDates:      'Nessuna data scelta',
         showMore:     (n) => `Mostra altri ${n} ▾`,
         showLess:     'Mostra meno ▴',
+        labelClosesAt: 'Chiusura del voto',
+        noDeadline:   'Nessun limite',
+        votingClosed: 'Votazione chiusa',
+        closesOn:     'Chiude',
         manageHead:   'Gestisci evento',
         labelDescM:   'Descrizione',
         labelDatesM:  'Date',
@@ -969,6 +1005,10 @@
         noDates:      'Não escolheu datas',
         showMore:     (n) => `Mostrar mais ${n} ▾`,
         showLess:     'Mostrar menos ▴',
+        labelClosesAt: 'Encerramento da votação',
+        noDeadline:   'Sem prazo',
+        votingClosed: 'Votação encerrada',
+        closesOn:     'Fecha',
         manageHead:   'Gerir evento',
         labelDescM:   'Descrição',
         labelDatesM:  'Datas',
@@ -1218,6 +1258,15 @@
             <label>${t('labelDates')}</label>
             <div class="cal" id="picker-cal"></div>
           </div>
+          <div class="field">
+            <label>${t('labelClosesAt')}</label>
+            <div class="preset-row" id="close-presets">
+              <button class="preset-btn active" data-days="0">${t('noDeadline')}</button>
+              <button class="preset-btn" data-days="7">1w</button>
+              <button class="preset-btn" data-days="14">2w</button>
+              <button class="preset-btn" data-days="28">4w</button>
+            </div>
+          </div>
           <button class="btn" id="create">${t('createSubmit')}</button>
           <div class="err" id="err"></div>
           <div id="created"></div>
@@ -1225,10 +1274,20 @@
       initPicker([]);
       renderPicker();
       wireTextareas(app);
-      document.getElementById('create').addEventListener('click', createEvent);
+
+      let selectedCloseDays = 0;
+      document.getElementById('close-presets').addEventListener('click', e => {
+        const btn = e.target.closest('.preset-btn');
+        if (!btn) return;
+        document.querySelectorAll('#close-presets .preset-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedCloseDays = Number(btn.dataset.days);
+      });
+
+      document.getElementById('create').addEventListener('click', () => createEvent(selectedCloseDays));
     }
 
-    async function createEvent() {
+    async function createEvent(closeDays = 0) {
       const title = document.getElementById('title').value.trim();
       const description = document.getElementById('description').value.trim();
       const dates = [...picker.selected].sort();
@@ -1237,13 +1296,17 @@
       if (!title) { err.textContent = t('errTitle'); return; }
       if (dates.length === 0) { err.textContent = t('errDates'); return; }
 
+      const closes_at = closeDays > 0
+        ? new Date(Date.now() + closeDays * 864e5).toISOString()
+        : null;
+
       const btn = document.getElementById('create');
       btn.disabled = true; btn.textContent = t('creating');
       try {
         const r = await fetch(`${API}/events`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, description, dates }),
+          body: JSON.stringify({ title, description, dates, closes_at }),
         });
         if (!r.ok) throw new Error();
         const data = await r.json();
@@ -1547,17 +1610,24 @@
       const results = buildResultsHTML();
       const voter = getVoter(state.event.code);
 
+      const isClosed = state.event.closes_at && new Date(state.event.closes_at) < new Date();
+
+      let deadlineLine = '';
+      if (state.event.closes_at && !isClosed) {
+        const d = new Date(state.event.closes_at);
+        const f = fmtDate(d.toISOString().slice(0, 10));
+        const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        deadlineLine = `<span class="closes-badge">${t('closesOn')}: ${f.dow} ${f.day} ${esc(f.mon)}, ${time}</span>`;
+      }
+
       if (editing && voter) {
         state.selected = new Set(voter.dateIds.filter(id =>
           state.dates.some(d => d.id === id)));
       }
 
-      app.innerHTML = `
-        <div class="card">
-          <h1>${esc(state.event.title)}</h1>
-          ${state.event.description ? `<p class="desc">${esc(state.event.description)}</p>` : ''}
-
-          ${(alreadyVoted || justVoted) && !editing ? `
+      const voteSection = isClosed
+        ? `<div class="voted-confirm" style="margin-top:20px">${t('votingClosed')}</div>`
+        : (alreadyVoted || justVoted) && !editing ? `
           <div class="voted-confirm" style="margin-top:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
             <span>${t('alreadyVoted')}</span>
             ${voter ? `<button class="btn-outline" id="change-vote-btn">${t('changeVoteBtn')}</button>` : ''}
@@ -1579,14 +1649,24 @@
             </div>
           </div>
           <button class="btn" id="submit">${t('submitBtn')}</button>
-          <div class="err" id="err"></div>`}
+          <div class="err" id="err"></div>`;
+
+      app.innerHTML = `
+        <div class="card">
+          <h1>${esc(state.event.title)}</h1>
+          ${state.event.description ? `<p class="desc">${esc(state.event.description)}</p>` : ''}
+          ${deadlineLine}
+
+          ${voteSection}
 
           <hr class="divider" />
           ${justVoted ? `<div class="voted-confirm">${t('justVoted')}</div>` : ''}
           ${results.html}
         </div>`;
 
-      if ((alreadyVoted || justVoted) && !editing) {
+      if (isClosed) {
+        // no form to wire
+      } else if ((alreadyVoted || justVoted) && !editing) {
         document.getElementById('change-vote-btn')?.addEventListener('click', () => {
           renderPage(false, false, true);
         });
@@ -1679,6 +1759,15 @@
             <label>${t('labelDatesM')}</label>
             <div class="cal" id="picker-cal"></div>
           </div>
+          <div class="field">
+            <label>${t('labelClosesAt')}</label>
+            <div class="preset-row" id="close-presets">
+              <button class="preset-btn" data-days="0">${t('noDeadline')}</button>
+              <button class="preset-btn" data-days="7">1w</button>
+              <button class="preset-btn" data-days="14">2w</button>
+              <button class="preset-btn" data-days="28">4w</button>
+            </div>
+          </div>
           <div class="edit-actions">
             <button class="btn" id="save">${t('saveBtn')}</button>
             <button class="btn danger" id="delete">${t('deleteBtn')}</button>
@@ -1692,7 +1781,30 @@
       renderPicker();
       wireTextareas(app);
       document.getElementById('copy-code').addEventListener('click', () => copyToClipboard(state.event.code));
-      document.getElementById('save').addEventListener('click', saveManage);
+
+      // Pre-select the closest deadline preset (or no-deadline if none)
+      let managedCloseDays = 0;
+      {
+        const presetBtns = document.querySelectorAll('#close-presets .preset-btn');
+        const existingCloses = state.event.closes_at ? new Date(state.event.closes_at) : null;
+        if (existingCloses) {
+          const daysLeft = Math.round((existingCloses - new Date()) / 864e5);
+          const closest = [28, 14, 7].find(d => daysLeft <= d) || 7;
+          managedCloseDays = closest;
+        }
+        presetBtns.forEach(b => {
+          if (Number(b.dataset.days) === managedCloseDays) b.classList.add('active');
+        });
+        document.getElementById('close-presets').addEventListener('click', e => {
+          const btn = e.target.closest('.preset-btn');
+          if (!btn) return;
+          presetBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          managedCloseDays = Number(btn.dataset.days);
+        });
+      }
+
+      document.getElementById('save').addEventListener('click', () => saveManage(managedCloseDays));
       document.getElementById('delete').addEventListener('click', deleteManage);
       wireResults(results.hiddenCount);
     }
@@ -1701,7 +1813,7 @@
       return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminCode };
     }
 
-    async function saveManage() {
+    async function saveManage(closeDays = 0) {
       const title = document.getElementById('title').value.trim();
       const description = document.getElementById('description').value.trim();
       const dates = [...picker.selected].sort();
@@ -1710,13 +1822,17 @@
       if (!title) { err.textContent = t('errTitleM'); return; }
       if (dates.length === 0) { err.textContent = t('errDatesM'); return; }
 
+      const closes_at = closeDays > 0
+        ? new Date(Date.now() + closeDays * 864e5).toISOString()
+        : '';
+
       const btn = document.getElementById('save');
       btn.disabled = true; btn.textContent = t('saving');
       try {
         const r = await fetch(`${API}/events/${state.event.id}`, {
           method: 'PATCH',
           headers: adminHeaders(),
-          body: JSON.stringify({ title, description, dates }),
+          body: JSON.stringify({ title, description, dates, closes_at }),
         });
         if (r.status === 401) { err.textContent = t('errAuth'); btn.disabled = false; btn.textContent = t('saveBtn'); return; }
         if (!r.ok) throw new Error();

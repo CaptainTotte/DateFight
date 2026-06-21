@@ -88,6 +88,8 @@ def init_db():
                 "UPDATE events SET admin_code = ? WHERE id = ?",
                 (_unique_admin_code(conn), e["id"]),
             )
+        if "closes_at" not in cols:
+            conn.execute("ALTER TABLE events ADD COLUMN closes_at TEXT")
 
 
 def seed_demo(conn):
@@ -197,6 +199,7 @@ def build_event_payload(conn, e, include_admin=False):
         "title": e["title"],
         "description": e["description"],
         "code": e["code"],
+        "closes_at": e["closes_at"],
     }
     if include_admin:
         event["admin_code"] = e["admin_code"]
@@ -216,12 +219,14 @@ class EventIn(BaseModel):
     title: str = Field(min_length=1)
     description: str = ""
     dates: list[str] = []
+    closes_at: str | None = None
 
 
 class UpdateEventIn(BaseModel):
     title: str | None = None
     description: str | None = None
     dates: list[str] | None = None
+    closes_at: str | None = None
 
 class VoteIn(BaseModel):
     event_id: str
@@ -245,8 +250,8 @@ def create_event(body: EventIn):
         admin_code = _unique_admin_code(conn)
 
         conn.execute(
-            "INSERT INTO events (id, title, description, code, admin_code, created_at) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO events (id, title, description, code, admin_code, created_at, closes_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 event_id,
                 body.title.strip(),
@@ -254,6 +259,7 @@ def create_event(body: EventIn):
                 code,
                 admin_code,
                 now_iso(),
+                body.closes_at,
             ),
         )
         for d in body.dates:
@@ -291,6 +297,9 @@ def update_event(event_id: str, body: UpdateEventIn, _: bool = Depends(require_e
                         "INSERT INTO event_dates (event_id, date) VALUES (?, ?)",
                         (event_id, d),
                     )
+        if body.closes_at is not None:
+            val = body.closes_at.strip() or None
+            conn.execute("UPDATE events SET closes_at = ? WHERE id = ?", (val, event_id))
     return {"updated": True}
 
 
@@ -340,10 +349,12 @@ def resolve_code(code: str):
 def create_vote(body: VoteIn):
     with get_db() as conn:
         e = conn.execute(
-            "SELECT id FROM events WHERE id = ?", (body.event_id,)
+            "SELECT id, closes_at FROM events WHERE id = ?", (body.event_id,)
         ).fetchone()
         if not e:
             raise HTTPException(status_code=404, detail="Event not found")
+        if e["closes_at"] and now_iso() > e["closes_at"]:
+            raise HTTPException(status_code=403, detail="Voting closed")
 
         duplicate = conn.execute(
             "SELECT 1 FROM votes WHERE event_id = ? AND first_name = ? AND last_name = ?",
@@ -383,10 +394,12 @@ def create_vote(body: VoteIn):
 def update_vote(body: VoteIn):
     with get_db() as conn:
         e = conn.execute(
-            "SELECT id FROM events WHERE id = ?", (body.event_id,)
+            "SELECT id, closes_at FROM events WHERE id = ?", (body.event_id,)
         ).fetchone()
         if not e:
             raise HTTPException(status_code=404, detail="Event not found")
+        if e["closes_at"] and now_iso() > e["closes_at"]:
+            raise HTTPException(status_code=403, detail="Voting closed")
 
         existing = conn.execute(
             "SELECT id FROM votes WHERE event_id = ? AND first_name = ? AND last_name = ?",
