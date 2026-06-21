@@ -269,19 +269,34 @@
     .desc { color: var(--muted); margin-top: 8px; }
 
     .topbar {
-      position: relative;
       display: flex;
       justify-content: center;
       align-items: flex-end;
       margin-bottom: 0;
     }
+    #lang-picker { position: fixed; top: 16px; right: 16px; z-index: 200; }
     #lang-btn {
-      position: absolute; right: 0; bottom: 30px;
-      background: none; border: 1px solid var(--border); color: var(--muted);
-      border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 600;
-      font-family: inherit; cursor: pointer; transition: border-color .15s, color .15s;
+      display: flex; align-items: center; gap: 6px;
+      background: var(--bg-elev); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 8px 12px; font-size: 13px; font-weight: 600;
+      font-family: inherit; cursor: pointer; transition: border-color .15s;
     }
-    #lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+    #lang-btn:hover { border-color: var(--accent); }
+    #lang-menu {
+      position: absolute; top: calc(100% + 6px); right: 0;
+      background: var(--bg-elev); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden; min-width: 140px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    }
+    .lang-opt {
+      display: flex; align-items: center; gap: 8px; width: 100%;
+      padding: 10px 14px; background: none; border: none; color: var(--text);
+      font-family: inherit; font-size: 14px; cursor: pointer; text-align: left;
+      transition: background .1s;
+    }
+    .lang-opt:hover { background: var(--accent-soft); }
+    .lang-opt.active { color: var(--accent); font-weight: 600; }
+    .lang-opt.active::after { content: '✓'; margin-left: auto; }
 
     .bottom-nav { display: flex; justify-content: center; margin-top: 24px; }
     #change-event {
@@ -312,10 +327,20 @@
   </style>
 </head>
 <body>
+  <div id="lang-picker">
+    <button id="lang-btn" aria-haspopup="true" aria-expanded="false">
+      <span id="lang-flag">🇸🇪</span>
+      <span id="lang-name">Svenska</span>
+      <span>▾</span>
+    </button>
+    <div id="lang-menu" class="hidden" role="menu">
+      <button class="lang-opt" data-lang="sv" role="menuitem">🇸🇪 Svenska</button>
+      <button class="lang-opt" data-lang="en" role="menuitem">🇬🇧 English</button>
+    </div>
+  </div>
   <div class="wrap">
     <div class="topbar">
       <div class="brand"><img src="/img/image.png" alt="DateFight" /></div>
-      <button id="lang-btn">EN</button>
     </div>
     <div id="app"></div>
     <div class="bottom-nav">
@@ -338,6 +363,8 @@
         dows:         ['Sön','Mån','Tis','Ons','Tor','Fre','Lör'],
         dowsHdr:      ['Mån','Tis','Ons','Tor','Fre','Lör','Sön'],
         leder:        'Leder',
+        langFlag:     '🇸🇪',
+        langName:     'Svenska',
         landingHead:  'Gå med eller hantera',
         landingDesc:  'Ange din 4-teckens kod — röstkod eller admin-kod.',
         continueBtn:  'Fortsätt →',
@@ -405,7 +432,6 @@
         errSave:      'Kunde inte spara.',
         backBtn:      '← Till start',
         footer:       '© 2026 DateFight · Hitta dagen som funkar för alla',
-        langBtn:      'EN',
       },
       en: {
         months:       ['January','February','March','April','May','June','July','August','September','October','November','December'],
@@ -413,6 +439,8 @@
         dows:         ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
         dowsHdr:      ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
         leder:        'Leading',
+        langFlag:     '🇬🇧',
+        langName:     'English',
         landingHead:  'Join or manage an event',
         landingDesc:  'Enter your 4-character code — voting code or admin code.',
         continueBtn:  'Continue →',
@@ -480,7 +508,6 @@
         errSave:      'Could not save.',
         backBtn:      '← Back to start',
         footer:       '© 2026 DateFight · Find the day that works for everyone',
-        langBtn:      'SV',
       },
     };
 
@@ -495,7 +522,6 @@
     const API = '/api';
     const app = document.getElementById('app');
     const changeBtn = document.getElementById('change-event');
-    const langBtn = document.getElementById('lang-btn');
     const footerText = document.getElementById('footer-text');
     const state = { event: null, dates: [], tallies: {}, votes: [], selected: new Set() };
     let calYear = 0, calMonth = 0;
@@ -509,16 +535,12 @@
     ================================================================ */
     function applyLang() {
       document.documentElement.lang = lang;
-      langBtn.textContent = t('langBtn');
+      document.getElementById('lang-flag').textContent = t('langFlag');
+      document.getElementById('lang-name').textContent = t('langName');
       changeBtn.textContent = t('backBtn');
       footerText.textContent = t('footer');
-    }
-
-    function switchLang() {
-      lang = lang === 'sv' ? 'en' : 'sv';
-      localStorage.setItem('df_lang', lang);
-      applyLang();
-      rerenderCurrent();
+      document.querySelectorAll('.lang-opt').forEach(el =>
+        el.classList.toggle('active', el.dataset.lang === lang));
     }
 
     function rerenderCurrent() {
@@ -531,7 +553,30 @@
       });
     }
 
-    langBtn.addEventListener('click', switchLang);
+    const langPickerEl = document.getElementById('lang-picker');
+    const langMenuEl   = document.getElementById('lang-menu');
+    const langBtnEl    = document.getElementById('lang-btn');
+
+    langBtnEl.addEventListener('click', () => {
+      const open = langMenuEl.classList.toggle('hidden') === false;
+      langBtnEl.setAttribute('aria-expanded', open);
+    });
+
+    document.addEventListener('click', e => {
+      if (!langPickerEl.contains(e.target)) langMenuEl.classList.add('hidden');
+    });
+
+    document.querySelectorAll('.lang-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        lang = btn.dataset.lang;
+        localStorage.setItem('df_lang', lang);
+        langMenuEl.classList.add('hidden');
+        langBtnEl.setAttribute('aria-expanded', false);
+        applyLang();
+        rerenderCurrent();
+      });
+    });
+
     applyLang();
 
     changeBtn.addEventListener('click', () => {
