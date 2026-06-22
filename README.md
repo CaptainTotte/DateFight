@@ -7,7 +7,7 @@ No accounts, no login required. Each fight has its own private admin code — on
 ## Stack
 
 - **Backend** — FastAPI + SQLite (`sqlite3`, no ORM), served by uvicorn
-- **Frontend** — Vanilla HTML/CSS/JS, no framework, no build step
+- **Frontend** — Vanilla HTML/CSS/JS, no framework, no build step. UI available in English, Swedish, German, Spanish, French, Italian, and Portuguese — auto-detected via `navigator.language`, overridable via the language picker.
 - **Infra** — Docker Compose: `api` (FastAPI) + `web` (nginx static files + `/api/` proxy)
 
 ## Quick start
@@ -112,7 +112,7 @@ backend/
   main.py          # entire API in one file
 frontend/
   index.html       # SPA — landing, create, vote, manage views
-  img/             # logo assets
+  img/             # logo + og.png (1200×630 Open Graph image)
 ```
 
 ## Local development without Docker
