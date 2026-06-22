@@ -21,6 +21,8 @@
   <meta name="twitter:description" content="Create a fight over a date and let participants vote. The easiest way to find a time that works for everyone." />
   <meta name="twitter:image" content="https://datefight.tottelundgren.com/img/og.png" />
 
+  <script defer src="https://stats.tottelundgren.com/script.js" data-website-id="5ab17070-35aa-41ea-9f44-2b1745874ac9"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -442,7 +444,10 @@
     /* ================================================================
        Translations
     ================================================================ */
-    let lang = localStorage.getItem('df_lang') || 'en';
+    const supportedLangs = ['en','sv','de','es','fr','it','pt'];
+    const browserLang = (navigator.language || '').slice(0, 2);
+    const defaultLang = supportedLangs.includes(browserLang) ? browserLang : 'en';
+    let lang = localStorage.getItem('df_lang') || defaultLang;
 
     const T = {
       sv: {
